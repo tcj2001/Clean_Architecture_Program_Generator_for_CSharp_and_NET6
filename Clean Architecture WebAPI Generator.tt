@@ -1,0 +1,459 @@
+﻿<#@ template language="C#" debug="true" hostspecific="true" #>
+<#@ output extension=".txt" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data.Entity" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="EnvDTE" #>
+<#@ include file="T4Helper.ttinclude" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+
+<#
+    /////////////////////////////
+    // Generate WebAPI project //
+    /////////////////////////////
+    string StartupProject = "WebAPI";
+    CreateWebProject("WebAPI");
+#>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\Persistence\Persistence.csproj" />
+  </ItemGroup>
+
+</Project>
+<# OverwriteFile(StartupProject, "", "WebAPI.csproj"); #>
+<#  
+    ////////////////////////////////////////////////////////
+    // Get defined Entities details and DbContext details //
+    ////////////////////////////////////////////////////////
+    string EntityNamespace = "Domain.Entities";
+    string DbContextNamespace = "Persistence.Context";
+    string efContext = "ApplicationDbContext"; //If Context is not in the same namespace rename this to the name of the context
+
+    IServiceProvider serviceProvider = (IServiceProvider)this.Host;
+    DTE dte = serviceProvider.GetService(typeof(DTE)) as DTE; 
+    var project1 = FindProjectByName(dte, "Domain");
+    var classes = FindClasses(project1, EntityNamespace, "");
+    var classNames = classes
+                    .Select(currentClass => currentClass.Name)
+                    .ToList();
+    var project2 = FindProjectByName(dte, "Persistence");
+    var dbcclass = FindClasses(project2, DbContextNamespace, "");
+    var classWithDbContext = dbcclass.FirstOrDefault(currentClass => currentClass.Bases.OfType<CodeElement>().Any(currentBase => currentBase.Name == "DbContext"));
+    if(classWithDbContext != null)
+    {
+        efContext = classWithDbContext.Name;
+    }
+#>
+//////////////////////////////////////////
+// generated AddApplicationExtension.cs //
+//////////////////////////////////////////
+using Application.Interfaces;
+using Application.Services;
+
+namespace <#= StartupProject #>.Extensions
+{
+    public static class AddApplicationExtension
+    {
+        public static IServiceCollection AddApplication(this IServiceCollection services)
+        {
+            services.AddScoped<IServiceManager, ServiceManager>();
+            return services;
+        }
+    }
+}
+<# CreateFile(StartupProject, "Extensions","AddApplicationExtension.cs"); #>
+//////////////////////////////////////////
+// generated AddPersistenceExtension.cs //
+//////////////////////////////////////////
+using Domain.Interfaces;
+using Persistence.Context;
+using Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+
+namespace <#= StartupProject #>.Extensions
+{
+    public static class AddPersistenceExtension
+    {
+        public static IServiceCollection AddPersistence(this IServiceCollection services)
+        {
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=SqliteDb"));
+            //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDb"));
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
+            return services;
+        }
+    }
+}
+<# CreateFile(StartupProject, "Extensions","AddPersistenceExtension.cs"); #>
+//////////////////////////////////////////
+// generated AddBasicAuthExtension.cs //
+//////////////////////////////////////////
+using <#= StartupProject #>.Middlewares;
+
+namespace <#= StartupProject #>.Extensions
+{
+    public static class AddBasicAuthExtension
+    {
+        public static IApplicationBuilder UseBasicAuthMiddleware(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<BasicAuthMiddleware>();
+        }
+    }
+}
+<# CreateFile(StartupProject, "Extensions","AddBasicAuthExtension.cs"); #>
+//////////////////////////////////////////////
+// generated ExceptionHandlingMiddleware.cs //
+//////////////////////////////////////////////
+using Domain.Exceptions;
+using System.Text.Json;
+
+namespace <#= StartupProject #>.Middlewares
+{
+    internal sealed class ExceptionHandlingMiddleware : IMiddleware
+    {
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+
+        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger) => _logger = logger;
+
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        {
+            try
+            {
+                await next(context);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+
+                await HandleExceptionAsync(context, e);
+            }
+        }
+
+        private static async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
+        {
+            httpContext.Response.ContentType = "application/json";
+
+            httpContext.Response.StatusCode = exception switch
+            {
+                BadRequestException => StatusCodes.Status400BadRequest,
+                NotFoundException => StatusCodes.Status404NotFound,
+                _ => StatusCodes.Status500InternalServerError
+            };
+
+            var response = new
+            {
+                error = exception.Message
+            };
+
+            await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response));
+        }
+    }
+}
+<# CreateFile(StartupProject, "Middlewares","ExceptionHandlingMiddleware.cs"); #>
+//////////////////////////////////////////////
+// generated BasicAuthMiddleware.cs //
+//////////////////////////////////////////////
+using Microsoft.Extensions.Options;
+using System.Text;
+using <#= StartupProject #>.AppSetting;
+
+namespace <#= StartupProject #>.Middlewares
+{
+    public class BasicAuthMiddleware
+    {
+        private readonly RequestDelegate _next;
+        private readonly BasicAuthentication _basicAuthentication;
+        public BasicAuthMiddleware(RequestDelegate next, IOptions<BasicAuthentication> basicAuthentication)
+        {
+            _next = next;
+            _basicAuthentication = basicAuthentication.Value;
+        }
+
+        public async Task Invoke(HttpContext httpContext)
+        {
+            string authHeader = httpContext.Request.Headers["Authorization"];
+            if (authHeader != null)
+            {
+                string auth = authHeader.Split(new char[] { ' ' })[1];
+                Encoding encoding = Encoding.GetEncoding("UTF-8");
+                var usernameAndPassword = encoding.GetString(Convert.FromBase64String(auth));
+                string username = usernameAndPassword.Split(new char[] { ':' })[0];
+                string password = usernameAndPassword.Split(new char[] { ':' })[1];
+                if (_basicAuthentication.User == username && _basicAuthentication.Password == password)
+                {
+                    await _next(httpContext);
+                }
+                else
+                {
+                    httpContext.Response.StatusCode = 401;
+                    return;
+                }
+            }
+            else
+            {
+                httpContext.Response.StatusCode = 401;
+                return;
+            }
+        }
+
+    }
+}
+<# CreateFile(StartupProject, "Middlewares","BasicAuthMiddleware.cs"); #>
+//////////////////////////////////////
+// generated BasicAuthentication.cs //
+//////////////////////////////////////
+namespace <#= StartupProject #>.AppSetting
+{
+    public class BasicAuthentication
+    {
+        public string User { get; set; }
+        public string Password { get; set; }
+    }
+}
+<# CreateFile(StartupProject, "AppSetting","BasicAuthentication.cs"); #>
+//////////////////////////
+// generated Program.cs //
+//////////////////////////
+using Microsoft.OpenApi.Models;
+using Serilog;
+using <#= StartupProject #>.AppSetting;
+using <#= StartupProject #>.Extensions;
+using <#= StartupProject #>.Middlewares;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var configuration = new ConfigurationBuilder()
+    // Read from your appsettings.json.
+    .AddJsonFile("appsettings.json")
+    // Read from your secrets.
+    //.AddUserSecrets<Program>(optional: true)
+    //.AddEnvironmentVariables()
+    .Build();
+
+// Add controllers
+builder.Services.AddControllers();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+
+    //the following is only needed for swagger to enable basic authenication
+    c.AddSecurityDefinition("basic", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "basic",
+        In = ParameterLocation.Header,
+        Description = "Basic Authorization header using the Bearer scheme."
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "basic"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+
+});
+
+// added these for this project
+builder.Services.AddPersistence();
+builder.Services.AddApplication();
+
+//this is needed for Serilog.AspNetCore, Serilog.Settings.Configuration, Serilog.Sinks.File, Serilog.Sinks.Console,Serilog.Expressions
+//installed in application project,
+//this project has reference to application project
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(configuration)
+    .CreateLogger();
+builder.Host.UseSerilog();
+
+//this is need for basic authentication
+builder.Services.Configure<BasicAuthentication>(configuration.GetSection("BasicAuthentication"));
+
+//this is need for exception handling
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
+        c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", "API v1");
+    });
+}
+
+//added to handle basic authentication     
+app.UseBasicAuthMiddleware();
+
+//added to handle exceptions
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseHttpsRedirection();
+
+//app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+<# OverwriteFile(StartupProject, "","Program.cs"); #>
+<#
+////////////////////////////////
+// generated appsettings.json //
+////////////////////////////////
+#>
+{
+  //define connection here
+  "ConnectionStrings": {
+    "SqliteDB": "DataSource=app.db;Cache=Shared",
+    "SqlServerDB": "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"
+  },
+  
+  //required for basic authentication
+  "BasicAuthentication": {
+    "User": "SOMEuser",
+    "Password":"SOMEpassword"
+  },
+  
+  //required to control serilog
+  "Serilog": {
+    "MinimumLevel": "Information",
+    "Override": {
+      "Microsoft.AspNetCore": "Warning"
+    },
+    "WriteTo": [
+      {
+        "Name": "Console"
+      },
+      {
+        "Name": "File",
+        "Args": {
+          "path": "Logs\\AppLogs.log",
+          "outputTemplate": "{Timestamp:HH:mm:ss.fff zzz} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}"
+        }
+      }
+    ],
+    "Filter": [
+      {
+        "Name": "ByExcluding",
+        "Args": {
+          "expression": "StartsWith(SourceContext, 'Microsoft.')"
+        }
+      }
+    ]
+  },
+  "AllowedHosts": "*"
+}
+<# OverwriteFile(StartupProject, "","appsettings.json"); #>
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+    var controller =  properClassName + "Controller";
+    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+#>
+////////////////////////////////////
+// generated <#= controller #>.cs //
+////////////////////////////////////
+using Application.Interfaces;
+using Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace Presentation.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class <#= properClassName #>Controller : ControllerBase
+    {
+        private readonly ILogger<<#= properClassName #>Controller> logger;
+        private readonly IServiceManager _serviceManager;
+
+        public <#= properClassName #>Controller(IServiceManager serviceManager, ILogger<<#= properClassName #>Controller> logger)
+        {
+            _serviceManager = serviceManager;
+            this.logger = logger;
+        }
+        // GET: api/<<#= properClassName #>Controller>
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.GetAll<#= properClassName #>();
+            return Ok(result.entities);
+        }
+
+        // GET api/<<#= properClassName #>Controller>/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(<#= key1Type #> id)
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
+            return Ok(result.entity);
+        }
+
+        // POST api/<<#= properClassName #>Controller>
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] <#= properClassName #> entity)
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.Add<#= properClassName #>(entity);
+            return Ok(result);
+        }
+
+        // PUT api/<<#= properClassName #>Controller>/5
+        [HttpPut()]
+        public async Task<IActionResult> Put([FromBody] <#= properClassName #> entity)
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(entity);
+            return Ok(result);
+        }
+
+        // DELETE api/<<#= properClassName #>Controller>/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(<#= key1Type #> id)
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(id);
+            return Ok(result);
+        }
+    }
+}
+<# CreateFile(StartupProject, "Controllers", controller+".cs"); #>
+<#
+}
+#>

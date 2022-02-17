@@ -1,0 +1,715 @@
+﻿<#@ template language="C#" debug="true" hostspecific="true" #>
+<#@ output extension=".txt" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data.Entity" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="EnvDTE" #>
+<#@ include file="T4Helper.ttinclude" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+<# 
+    /////////////////////////////
+    // Generate Domain project //
+    /////////////////////////////
+    CreateClassLibraryProject("Domain");
+#>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
+  </ItemGroup>
+</Project>
+<# OverwriteFile("Domain", "","Domain.csproj"); #>
+/////////////////////////
+// generated Sample.cs //
+/////////////////////////
+using System.ComponentModel.DataAnnotations;
+
+namespace Domain.Entities
+{
+    public class Sample
+    {
+        [Key]
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+    }
+}
+<# CreateFile("Domain", "Entities","Sample.cs"); #>
+<# 
+    //////////////////////////////////
+    // Generate Application project //
+    //////////////////////////////////
+    CreateClassLibraryProject("Application");
+#>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+    <PackageReference Include="Serilog.Expressions" Version="3.2.1" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
+</Project>
+<# OverwriteFile("Application", "","Application.csproj"); #>
+<#
+    //////////////////////////////////
+    // Generate Persistence project //
+    //////////////////////////////////
+    CreateClassLibraryProject("Persistence");
+#>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+  </ItemGroup>
+
+</Project>
+<# OverwriteFile("Persistence", "","Persistence.csproj"); #>
+///////////////////////////////////////
+// generated ApplicationDbContext.cs //
+///////////////////////////////////////
+using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace Persistence.Context
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlite("DataSource=app.db;Cache=Shared");
+            }
+        }
+
+        public DbSet<Sample> Samples { get; set; }
+    }
+}
+<# CreateFile("Persistence", "Context","ApplicationDbContext.cs"); #>
+<#
+    //////////////////////////////
+    // Generate Startup project //
+    //////////////////////////////
+    CreateConsoleAppProject("Startup");
+#>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Persistence\Persistence.csproj" />
+  </ItemGroup>
+
+</Project>
+<# OverwriteFile("Startup", "","Startup.csproj"); #>
+//////////////////////////
+// generated Program.cs //
+/////////////////////////
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Persistence.Context;
+
+namespace startup
+{
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            await Host.CreateDefaultBuilder(args)
+                .ConfigureServices((hostContext, services) =>
+                {
+                    //required if you are using entity framework
+                    //now using Sqllite as database
+                    services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("DataSource=app.db"));
+                    //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"));
+                })
+                .RunConsoleAsync();
+        }
+    }
+}
+<# OverwriteFile("Startup", "","Program.cs"); #>
+<#  
+    ////////////////////////////////////////////////////////
+    // Get defined Entities details and DbContext details //
+    ////////////////////////////////////////////////////////
+    string EntityNamespace = "Domain.Entities";
+    string DbContextNamespace = "Persistence.Context";
+    string efContext = "ApplicationDbContext"; //If Context is not in the same namespace rename this to the name of the context
+
+    IServiceProvider serviceProvider = (IServiceProvider)this.Host;
+    DTE dte = serviceProvider.GetService(typeof(DTE)) as DTE; 
+    var project1 = FindProjectByName(dte, "Domain");
+    var classes = FindClasses(project1, EntityNamespace, "");
+    var classNames = classes
+                    .Select(currentClass => currentClass.Name)
+                    .ToList();
+    var project2 = FindProjectByName(dte, "Persistence");
+    var dbcclass = FindClasses(project2, DbContextNamespace, "");
+    var classWithDbContext = dbcclass.FirstOrDefault(currentClass => currentClass.Bases.OfType<CodeElement>().Any(currentBase => currentBase.Name == "DbContext"));
+    if(classWithDbContext != null)
+    {
+        efContext = classWithDbContext.Name;
+    }
+#>
+/////////////////////////////////////
+// generated IGenericRepository.cs //
+/////////////////////////////////////
+using System.Linq.Expressions;
+
+namespace Domain.Interfaces
+{
+    public interface IGenericRepository<T> where T : class
+    {
+        ValueTask<T?> GetById(int id);
+        ValueTask<T?> GetById(string id);
+        Task<IEnumerable<T>> GetAll();
+        Task<IEnumerable<T>> Find(Expression<Func<T, bool>> expression);
+        Task Add(T entity);
+        void Remove(T entitiy);
+        void Update(T entitiy);
+
+    }
+}
+<# CreateFile("Domain", "Interfaces","IGenericRepository.cs"); #>
+////////////////////////////////////
+// generated GenericRepository.cs //
+////////////////////////////////////
+using Domain.Interfaces;
+using Persistence.Context;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+
+namespace Persistence.Repositories
+{
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    {
+        //replace DbContex with ApplicationDbContext
+        public ApplicationDbContext _context;
+
+        public GenericRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public virtual async ValueTask<T?> GetById(int id)
+        {
+            return await _context.Set<T>().FindAsync(id);
+        }
+        public virtual async ValueTask<T?> GetById(string id)
+        {
+            return await _context.Set<T>().FindAsync(id);
+        }
+        public virtual async Task<IEnumerable<T>> GetAll()
+        {
+            return await _context.Set<T>().ToListAsync();
+        }
+        public virtual async Task<IEnumerable<T>> Find(Expression<Func<T, bool>> expression)
+        {
+            return await _context.Set<T>().Where(expression).ToListAsync();
+        }
+        public virtual async Task Add(T entity)
+        {
+            await _context.Set<T>().AddAsync(entity);
+        }
+        public virtual void Remove(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+
+        }
+        public virtual void Update(T entity)
+        {
+            _context.Set<T>().Update(entity);
+        }
+    }
+}
+<# CreateFile("Persistence", "Repositories","GenericRepository.cs"); #>
+//////////////////////////////
+// generated IUnitOfWork.cs //
+//////////////////////////////
+namespace Domain.Interfaces
+{
+    public interface IUnitOfWork
+    {
+        Task BeginTransactionAsync(CancellationToken cancellationToken = default);
+        Task CommitTransactionAsync(CancellationToken cancellationToken = default);
+        Task<int> CompleteAsync(CancellationToken cancellationToken = default);
+    }
+}
+<# CreateFile("Domain", "Interfaces","IUnitOfWork.cs"); #>
+/////////////////////////////
+// generated UnitOfWork.cs //
+/////////////////////////////
+using Domain.Interfaces;
+using Persistence.Context;
+using Microsoft.EntityFrameworkCore.Storage;
+
+
+namespace Persistence.Repositories
+{
+    public class UnitOfWork : IUnitOfWork
+    {
+        private readonly ApplicationDbContext _context;
+
+        private IDbContextTransaction _transaction;
+
+        public UnitOfWork(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        }
+
+        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            await _transaction.CommitAsync(cancellationToken);
+        }
+
+        public async Task<int> CompleteAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public void Dispose()
+        {
+            _transaction?.Dispose();
+
+            _context.Dispose();
+        }
+    }
+}
+<# CreateFile("Persistence", "Repositories","UnitOfWork.cs"); #>
+//////////////////////////////////////
+// generated BadRequestException.cs //
+//////////////////////////////////////
+namespace Domain.Exceptions
+{
+    public abstract class BadRequestException : Exception
+    {
+        protected BadRequestException(string message) : base(message)
+        {
+        }
+    }
+}
+<# CreateFile("Domain", "Exceptions","BadRequestException.cs"); #>
+////////////////////////////////////
+// generated NotFoundException.cs //
+////////////////////////////////////
+namespace Domain.Exceptions
+{
+    public abstract class NotFoundException : Exception
+    {
+        protected NotFoundException(string message) : base(message)
+        {
+        }
+    }
+}
+<# CreateFile("Domain", "Exceptions","NotFoundException.cs"); #>
+//////////////////////////////////////////
+// generated EntityKeyFoundException.cs //
+//////////////////////////////////////////
+namespace Domain.Exceptions
+{
+    public sealed class EntityKeyFoundException : BadRequestException
+    {
+        public EntityKeyFoundException(string entity, string id)
+            : base(String.Format("Entity {0} with the identifier {1} exist.", entity, id))
+        {
+        }
+    }
+}
+<# CreateFile("Domain", "Exceptions","EntityKeyFoundException.cs"); #>
+/////////////////////////////////////////////
+// generated EntityKeyNotFoundException.cs //
+/////////////////////////////////////////////
+namespace Domain.Exceptions
+{
+    public sealed class EntityKeyNotFoundException : NotFoundException
+    {
+        public EntityKeyNotFoundException(string entity, string id)
+            : base(String.Format("Entity {0} with the identifier {1} was not found.", entity, id))
+        {
+        }
+    }
+}
+<# CreateFile("Domain", "Exceptions","EntityKeyNotFoundException.cs"); #>
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+    var repositoryName =  properClassName + "Repository";
+    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+#>
+/////////////////////////////////////////
+// generated I<#= repositoryName #>.cs //
+/////////////////////////////////////////
+using Domain.Entities;
+
+namespace Domain.Interfaces
+{
+    public interface I<#= repositoryName #> : IGenericRepository<<#= properClassName #>>
+    {
+        //Task<IEnumerable<<#= properClassName #>>> Get<#= properClassName #>ByName(string name);
+    }
+}
+<# CreateFile("Domain", "Interfaces", "I"+repositoryName+".cs"); #>
+<#
+}
+#>
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+    var repositoryName =  properClassName + "Repository";
+    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+#>
+////////////////////////////////////////
+// generated <#= repositoryName #>.cs //
+////////////////////////////////////////
+using Domain.Entities;
+using Domain.Interfaces;
+using Persistence.Context;
+
+namespace Persistence.Repositories
+{
+    public class <#= properClassName #>Repository : GenericRepository<<#= properClassName #>>, I<#= properClassName #>Repository
+    {
+        public <#= properClassName #>Repository(ApplicationDbContext context) : base(context)
+        {
+            _context = context;
+        }
+        //public async Task<IEnumerable<<#= properClassName #>>> Get<#= properClassName #>ByName(string name)
+        //{
+        //    return await _context.Set<<#= properClassName #>>().Where(x => x.Name == name).ToListAsync();
+        //}
+    }
+}
+<# CreateFile("Persistence", "Repositories", repositoryName+".cs"); #>
+<#
+}
+#>
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+    var serviceName =  properClassName + "Service";
+    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+#>
+//////////////////////////////////////
+// generated I<#= serviceName #>.cs //
+//////////////////////////////////////
+using Domain.Entities;
+using System.Linq.Expressions;
+
+namespace Application.Interfaces
+{
+    public interface I<#= properClassName #>Service
+    {
+        Task<string> Add<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default);
+        Task<(IEnumerable<<#= properClassName #>> entities, string Message)> Find<#= properClassName #>(Expression<Func<<#= properClassName #>, bool>> expression, CancellationToken cancellationToken = default);
+        Task<(IEnumerable<<#= properClassName #>> entities, string Message)> GetAll<#= properClassName #>(CancellationToken cancellationToken = default);
+        Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
+        Task<string> Remove<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
+        Task<string> Update<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default);
+    }
+}
+<# CreateFile("Application", "Interfaces", "I"+serviceName+".cs"); #>
+<#
+}
+#>
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+    var serviceName =  properClassName + "Service";
+    var repositoryName =  properClassName + "Repository";
+    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+#>
+/////////////////////////////////////
+// generated <#= serviceName #>.cs //
+/////////////////////////////////////
+using Application.Interfaces;
+using Domain.Entities;
+using Domain.Exceptions;
+using Domain.Interfaces;
+using System.Linq.Expressions;
+
+namespace Application.Services
+{
+    public class <#= properClassName #>Service : I<#= properClassName #>Service
+    {
+        private readonly IRepositoryManager _repositoryManager;
+
+        public <#= properClassName #>Service(IRepositoryManager repositoryManager)
+        {
+            _repositoryManager = repositoryManager;
+        }
+        public async Task<(IEnumerable<<#= properClassName #>> entities, string Message)> Find<#= properClassName #>(Expression<Func<<#= properClassName #>, bool>> expression, CancellationToken cancellationToken = default)
+        {
+            var items = await _repositoryManager.<#= properClassName #>Repository.Find(expression);
+            return (items, "<#= properClassName #> records retrieved");
+        }
+
+        public async Task<(IEnumerable<<#= properClassName #>> entities, string Message)> GetAll<#= properClassName #>(CancellationToken cancellationToken = default)
+        {
+            var items = await _repositoryManager.<#= properClassName #>Repository.GetAll();
+            return (items, "<#= properClassName #> records retrieved");
+        }
+
+        public async Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default)
+        {
+            var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key1 #>);
+            if (item == null)
+            {
+                throw new EntityKeyNotFoundException("<#= properClassName #>", <#= key1 #>.ToString());
+            }
+            return (item, "<#= properClassName #> record retrieved");
+        }
+
+        public async Task<string> Add<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default)
+        {
+            if (entity != null)
+            {
+                var item = await _repositoryManager.<#= properClassName #>Repository.GetById(entity.<#= key1 #>);
+                if (item != null)
+                {
+                    throw new EntityKeyFoundException("<#= properClassName #>", entity.<#= key1 #>.ToString());
+                }
+                else
+                {
+                    await _repositoryManager.<#= properClassName #>Repository.Add(entity);
+                    await _repositoryManager.UnitOfWork.CompleteAsync(cancellationToken);
+                    return "<#= properClassName #> record added";
+                }
+            }
+            throw new Exception("Add Error");
+        }
+
+        public async Task<string> Remove<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default)
+        {
+            var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key1 #>);
+            if (item == null)
+            {
+                throw new EntityKeyNotFoundException("<#= properClassName #>", <#= key1 #>.ToString());
+            }
+            else
+            {
+                _repositoryManager.<#= properClassName #>Repository.Remove(item);
+                await _repositoryManager.UnitOfWork.CompleteAsync(cancellationToken);
+                return "<#= properClassName #> record deleted";
+            }
+        }
+
+        public async Task<string> Update<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default)
+        {
+            if (entity != null)
+            {
+                var item = await _repositoryManager.<#= properClassName #>Repository.GetById(entity.<#= key1 #>);
+                if (item == null)
+                {
+                    throw new EntityKeyNotFoundException("<#= properClassName #>", entity.<#= key1 #>.ToString());
+                }
+                else
+                {
+                    //only place that need change if structure changes
+                    //item.Name = entity.Name;
+                    //item.Description = entity.Description;
+
+                    _repositoryManager.<#= properClassName #>Repository.Update(item);
+                    await _repositoryManager.UnitOfWork.CompleteAsync(cancellationToken);
+                    return "<#= properClassName #> record updated";
+                }
+            }
+            throw new Exception("Update Error");
+        }
+    }
+}
+<# CreateFile("Application", "Services", serviceName+".cs"); #>
+<#
+}
+#>
+//////////////////////////////////
+// generated IServiceManager.cs //
+//////////////////////////////////
+namespace Application.Interfaces
+{
+    public interface IServiceManager
+    {
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+        I<#= properClassName #>Service <#= properClassName #>Service { get; }
+<#
+}
+#>
+    }
+}
+<# OverwriteFile("Application", "Interfaces","IServiceManager.cs"); #>
+/////////////////////////////////
+// generated ServiceManager.cs //
+/////////////////////////////////
+using Application.Interfaces;
+using Domain.Interfaces;
+
+namespace Application.Services
+{
+    public class ServiceManager : IServiceManager
+    {
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+        private readonly Lazy<I<#= properClassName #>Service> _lazy<#= properClassName #>Service;
+<#
+}
+#>
+        public ServiceManager(IRepositoryManager repositoryManager)
+        {
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+            _lazy<#= properClassName #>Service = new Lazy<I<#= properClassName #>Service>(() => new <#= properClassName #>Service(repositoryManager));
+<#
+}
+#>
+        }
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+        public I<#= properClassName #>Service <#= properClassName #>Service => _lazy<#= properClassName #>Service.Value;
+<#
+}
+#>
+    }
+}
+<# OverwriteFile("Application", "Services","ServiceManager.cs"); #>
+/////////////////////////////////////
+// generated IRepositoryManager.cs //
+/////////////////////////////////////
+namespace Domain.Interfaces
+{
+    public interface IRepositoryManager
+    {
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+        I<#= properClassName #>Repository <#= properClassName #>Repository { get; }
+<#
+}
+#>
+        IUnitOfWork UnitOfWork { get; }
+    }
+}
+<# OverwriteFile("Domain", "Interfaces","IRepositoryManager.cs"); #>
+////////////////////////////////////
+// generated RepositoryManager.cs //
+////////////////////////////////////
+using Domain.Interfaces;
+using Persistence.Context;
+
+namespace Persistence.Repositories
+{
+    public class RepositoryManager : IRepositoryManager
+    {
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+        private readonly Lazy<I<#= properClassName #>Repository> _lazy<#= properClassName #>Repository;
+<#
+}
+#>
+        private readonly Lazy<IUnitOfWork> _lazyUnitOfWork;
+
+        public RepositoryManager(ApplicationDbContext context)
+        {
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+            _lazy<#= properClassName #>Repository = new Lazy<I<#= properClassName #>Repository>(() => new <#= properClassName #>Repository(context));
+<#
+}
+#>
+            _lazyUnitOfWork = new Lazy<IUnitOfWork>(() => new UnitOfWork(context));
+        }
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+        public I<#= properClassName #>Repository <#= properClassName #>Repository => _lazy<#= properClassName #>Repository.Value;
+<#
+}
+#>
+        public IUnitOfWork UnitOfWork => _lazyUnitOfWork.Value;
+    }
+}
+<# OverwriteFile("Persistence", "Repositories","RepositoryManager.cs"); #>
