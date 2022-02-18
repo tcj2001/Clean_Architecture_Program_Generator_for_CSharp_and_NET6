@@ -1,18 +1,17 @@
 {
   "$schema": "http://json.schemastore.org/template",
   "author": "Thomson Mathews",
-  "classifications": [ "Thomson", "core", "console" ],
   "tags": {
     "language": "C#"
   },
-  "identity": "Clean_Architecture_Program_Generator_for_CSharp_and_NET6",
-  "name": "Clean_Architecture_Program_Generator_for_CSharp_and_NET6",
-  "shortName": "CA_PG_C#_NET6",
+  "identity": "Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution",
+  "name": "Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution",
+  "shortName": "CA_PG_C#_NET6_SOL",
   "sourceName": "Clean_Architecture",
   "sources": [
     {
       "modifiers": [
-        { "exclude": [ ".vs/**", ".template_config/**" ] }
+        { "exclude": [ ".vs/**", ".template_config/**", ".git**" ] }
       ]
     }
   ]
