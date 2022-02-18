@@ -1,66 +1,80 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Copyright>Thomson Mathews</Copyright>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Authors>Thomson Mathews</Authors>
-    <Version>1.2.6</Version>
-    <PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Copyright>Thomson Mathews</Copyright>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Authors>Thomson Mathews</Authors>
+		<Version>1.3.0</Version>
+		<PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 
-	<IncludeContentInPack>true</IncludeContentInPack>
-	<IncludeBuildOutput>false</IncludeBuildOutput>
-	<Description>This is a clean architecture project code generator which will generate repositories, services for each defined enitities along with unitofwork, it will also generate controllers for each entity in the WebAPI project</Description>
-	<PackageTags>Clean Architecture" Template WebAPI Web Repostory UnitOfWork Services Code Generator</PackageTags>
-      
-  </PropertyGroup>
+		<IncludeContentInPack>true</IncludeContentInPack>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<Description>This is a clean architecture project code generator which will generate repositories, services for each defined enitities along with unitofwork, it will also generate controllers for each entity in the WebAPI project</Description>
+		<PackageTags>Clean Architecture" Template WebAPI Web Repostory UnitOfWork Services Code Generator</PackageTags>
 
-  <ItemGroup>
-	  <Compile Remove="**\*" />
-  </ItemGroup>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="T4Helper.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>T4Helper.ttinclude</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="**\*" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Clean Architecture Database Access Generator.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
-      <Pack>True</Pack>
-	</Content>
-    <Content Include="Clean Architecture WebAPI Generator.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
-      <Pack>True</Pack>
-	</Content>
-	<Content Include="T4Helper.ttinclude">
-	  <Generator>TextTemplatingFileGenerator</Generator>
-	  <LastGenOutput>T4Helper.cs</LastGenOutput>
-      <Pack>True</Pack>
-	</Content>
-    <Content Include="README.md">
-	  <Pack>True</Pack>
-	  <PackagePath>\</PackagePath>
-	</Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Include="T4Helper.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>T4Helper.ttinclude</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include=".template.config\template.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="Clean Architecture Database Access Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
+			<Pack>True</Pack>
+		</Content>
+		<Content Include="Clean Architecture WebAPI Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
+			<Pack>True</Pack>
+		</Content>
+		<Content Include="T4Helper.ttinclude">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>T4Helper.cs</LastGenOutput>
+			<Pack>True</Pack>
+		</Content>
+		<Content Include="README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include=".template.config\template.json" />
+	</ItemGroup>
 
 
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Clean Architecture Database Access Generator.txt">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Clean Architecture Database Access Generator.tt</DependentUpon>
+	  </None>
+	  <None Update="Clean Architecture WebAPI Generator.txt">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Clean Architecture WebAPI Generator.tt</DependentUpon>
+	  </None>
+	</ItemGroup>
 
 </Project>
+
