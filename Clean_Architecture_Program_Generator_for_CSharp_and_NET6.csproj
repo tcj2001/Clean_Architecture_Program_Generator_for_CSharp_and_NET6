@@ -9,20 +9,42 @@
     <RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Thomson Mathews</Authors>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include=".template_config\template.json" />
+    <Content Include=".template.config\template.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Clean Architecture Database Access Generator.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
+    </None>
+    <None Update="Clean Architecture Database Access Generator.txt">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Clean Architecture Database Access Generator.tt</DependentUpon>
+    </None>
+    <None Update="Clean Architecture WebAPI Generator.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
+    </None>
+    <None Update="Clean Architecture WebAPI Generator.txt">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Clean Architecture WebAPI Generator.tt</DependentUpon>
+    </None>
     <None Update="README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
 </Project>
