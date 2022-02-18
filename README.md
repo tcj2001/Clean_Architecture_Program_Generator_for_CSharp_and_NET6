@@ -1,7 +1,9 @@
 ﻿# Clean Architecture Solution Program Generators
 ---
 ##### Installation Procedure   
-Create a ClassLibrary or a Console Project and then install Nuget Package  
+Create a ClassLibrary or a Console Project, make sure the project name is different from the solution name or uncheck "Place solution and project in the same diectory"  
+
+Install Nuget Package  
 ##### Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution  
 
 Once you install the Nuget package you will see three files added to your project  
@@ -37,7 +39,7 @@ Startup project is only used to run Entity framework commands with out a WebAPI 
 ---
 
 ####  Clean Architecture WebAPI Generator Template.tt
-This template will generate open a dialog box to select ASP.NET Core WebAPI project and will create a project named **WebAPI**
+This template will generate open a dialog box, select ASP.NET Core WebAPI project and will create a project named **WebAPI**
 ##### WebAPI Project:  
 
 Controller Folder:  
