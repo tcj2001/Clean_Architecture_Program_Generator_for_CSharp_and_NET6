@@ -9,13 +9,12 @@
     <RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Thomson Mathews</Authors>
-    <Version>1.1.3</Version>
+    <Version>1.1.5</Version>
     <PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
 	<IncludeContentInPack>true</IncludeContentInPack>
 	<IncludeBuildOutput>false</IncludeBuildOutput>
-	<ContentTargetFolders>/</ContentTargetFolders>	  
   </PropertyGroup>
 
   <ItemGroup>

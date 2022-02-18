@@ -1,0 +1,29 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Target Name="CopyT4ToProject" BeforeTargets="Build">
+        <Message Text="Copying T4 template to project" />
+        <Copy 
+          SourceFiles="$(MSBuildThisFileDirectory)..\content\Clean Architecture Database Access Generator.tt" 
+          DestinationFiles="$(MSBuildProjectDirectory)\Clean Architecture Database Access Generator.tt" 
+          SkipUnchangedFiles="true"/>
+        <Copy 
+          SourceFiles="$(MSBuildThisFileDirectory)..\content\Clean Architecture WebAPI Generator.tt" 
+          DestinationFiles="$(MSBuildProjectDirectory)\Clean Architecture WebAPI Generator.tt" 
+          SkipUnchangedFiles="true"/>
+        <Copy 
+          SourceFiles="$(MSBuildThisFileDirectory)..\content\T4Helper.ttinclude" 
+          DestinationFiles="$(MSBuildProjectDirectory)\T4Helper.ttinclude" 
+          SkipUnchangedFiles="true"/>
+    </Target>
+    
+    <ItemGroup>
+		<None Include="$(ProjectDir)\Clean Architecture Database Access Generator.tt">
+		   <Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Include="$(ProjectDir)\Clean Architecture WebAPI Generator.tt">
+		   <Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Include="$(ProjectDir)\T4Helper.ttinclude">
+		   <Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+    </ItemGroup>
+</Project>
