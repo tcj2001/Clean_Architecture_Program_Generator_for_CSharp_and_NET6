@@ -74,6 +74,15 @@
         var dte = serviceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
         return System.IO.Path.GetDirectoryName(dte.Solution.FullName);
     }
+    
+    public string GetSolutionNamedDirectory()
+    {
+        var serviceProvider = this.Host as IServiceProvider;
+        var dte = serviceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+        var _solution = (EnvDTE80.Solution2)dte.Solution;
+        //return _solution.FullName.Remove(_solution.FullName.Length-4);
+        return "";
+    }
 
     public Project CreateWebProject(string projectName)
     {
@@ -82,7 +91,7 @@
         var projx = FindProjectByName(dte, projectName);
         if(projx==null){
             var _solution = (EnvDTE80.Solution2)dte.Solution;
-            var solutionNameDirectory = _solution.FullName.Remove(_solution.FullName.Length-4);
+            var solutionNameDirectory = GetSolutionNamedDirectory();
             var csItemTemplatePath = _solution.GetProjectTemplate("WebTemplateCore.vstemplate", "CSharp");
             var proj = dte.Solution.AddFromTemplate(csItemTemplatePath, solutionNameDirectory+"\\"+projectName, projectName, false);
             return proj;
@@ -97,7 +106,7 @@
         var projx = FindProjectByName(dte, projectName);
         if(projx==null){
             var _solution = (EnvDTE80.Solution2)dte.Solution;
-            var solutionNameDirectory = _solution.FullName.Remove(_solution.FullName.Length-4);
+            var solutionNameDirectory =  GetSolutionNamedDirectory();
             var csItemTemplatePath = _solution.GetProjectTemplate("ClassLibrary.zip", "CSharp");
             var proj = dte.Solution.AddFromTemplate(csItemTemplatePath, solutionNameDirectory+"\\"+projectName, projectName, false);
             return proj;
@@ -112,7 +121,7 @@
         var projx = FindProjectByName(dte, projectName);
         if(projx==null){
             var _solution = (EnvDTE80.Solution2)dte.Solution;
-            var solutionNameDirectory = _solution.FullName.Remove(_solution.FullName.Length-4);
+            var solutionNameDirectory =  GetSolutionNamedDirectory();
             var csItemTemplatePath = _solution.GetProjectTemplate("ConsoleApplication.zip", "CSharp");
             var proj = dte.Solution.AddFromTemplate(csItemTemplatePath, solutionNameDirectory+"\\"+projectName, projectName, false);
             return proj;
