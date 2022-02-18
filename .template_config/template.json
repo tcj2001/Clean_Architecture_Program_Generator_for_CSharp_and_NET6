@@ -1,6 +1,7 @@
 {
   "$schema": "http://json.schemastore.org/template",
   "author": "Thomson Mathews",
+  "classifications": [ "Core", "Generator" ],
   "tags": {
     "language": "C#"
   },
@@ -11,7 +12,7 @@
   "sources": [
     {
       "modifiers": [
-        { "exclude": [ ".vs/**", ".template_config/**", ".git**" ] }
+        { "exclude": [ ".vs/**", ".template_config/**", ".git/**", "bin/**", "obj/**" ] }
       ]
     }
   ]
