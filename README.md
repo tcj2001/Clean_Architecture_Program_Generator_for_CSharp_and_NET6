@@ -1,6 +1,18 @@
-﻿# Clean Architecture Soultion Program Generators
+﻿# Clean Architecture Solution Program Generators
 ---
+###### Install template from Nuget package   
+dotnet new --install Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution
 
+###### You should see the installed template using  
+dotnet new -l
+
+###### To see how to uninstall this package 
+dotnet new --uninstall
+
+###### Uninstall template
+dotnet new --uninstall Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution
+
+---
 ## This project has two T4Templates
 ---
 

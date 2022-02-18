@@ -13,7 +13,8 @@
   "sources": [
     {
       "modifiers": [
-        { "exclude": [ ".vs/**", ".template_config/**", ".git/**", "bin/**", "obj/**" ] }
+        { "exclude": [ ".vs/**", ".template_config/**", ".git/**", "bin/**", "obj/**" ] },
+        { "include": [ "*.tt", "*.ttinclude" ] }
       ]
     }
   ]
