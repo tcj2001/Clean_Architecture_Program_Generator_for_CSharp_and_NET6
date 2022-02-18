@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -9,31 +9,60 @@
     <RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Thomson Mathews</Authors>
-    <Version>1.1.1</Version>
+    <Version>1.1.3</Version>
     <PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
 	<IncludeContentInPack>true</IncludeContentInPack>
 	<IncludeBuildOutput>false</IncludeBuildOutput>
-	<ContentTargetFolders>content</ContentTargetFolders>	  
+	<ContentTargetFolders>/</ContentTargetFolders>	  
   </PropertyGroup>
 
   <ItemGroup>
-	  <Content Include="templates\**\*" />
 	  <Compile Remove="**\*" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="templates\Clean Architecture Database Access Generator.tt">
+    <Content Include="Clean Architecture Database Access Generator.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
+    </Content>
+    <Content Include="Clean Architecture Database Access Generator.txt">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Clean Architecture Database Access Generator.tt</DependentUpon>
+    </Content>
+    <Content Include="Clean Architecture WebAPI Generator.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
+    </Content>
+    <Content Include="Clean Architecture WebAPI Generator.txt">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Clean Architecture WebAPI Generator.tt</DependentUpon>
+    </Content>
+    <Content Include="T4Helper.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>T4Helper.ttinclude</DependentUpon>
+    </Content>
+    <Content Include="T4Helper.ttinclude">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>T4Helper.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Clean Architecture Database Access Generator.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
     </None>
-    <None Update="templates\Clean Architecture Database Access Generator.txt">
+    <None Update="Clean Architecture Database Access Generator.txt">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Clean Architecture Database Access Generator.tt</DependentUpon>
     </None>
-    <None Update="templates\Clean Architecture WebAPI Generator.tt">
+    <None Update="Clean Architecture WebAPI Generator.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
     </None>
@@ -41,7 +70,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Update="templates\Clean Architecture WebAPI Generator.txt">
+    <None Update="Clean Architecture WebAPI Generator.txt">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Clean Architecture WebAPI Generator.tt</DependentUpon>
@@ -50,36 +79,6 @@
 
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="templates\Clean Architecture Database Access Generator.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
-    </Content>
-    <Content Update="templates\Clean Architecture Database Access Generator.txt">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Clean Architecture Database Access Generator.tt</DependentUpon>
-    </Content>
-    <Content Update="templates\Clean Architecture WebAPI Generator.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
-    </Content>
-    <Content Update="templates\Clean Architecture WebAPI Generator.txt">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Clean Architecture WebAPI Generator.tt</DependentUpon>
-    </Content>
-    <Content Update="templates\T4Helper.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>T4Helper.ttinclude</DependentUpon>
-    </Content>
-    <Content Update="templates\T4Helper.ttinclude">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4Helper.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
 
 </Project>
