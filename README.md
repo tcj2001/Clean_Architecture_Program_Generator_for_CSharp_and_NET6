@@ -1,16 +1,14 @@
 ﻿# Clean Architecture Solution Program Generators
 ---
-###### Install template from Nuget package   
-dotnet new --install Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution
+###### Installation Procedure   
+Create a ClassLibrary or a Console Project and then install Nuget Package  
+Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution  
 
-###### You should see the installed template using  
-dotnet new -l
-
-###### To see how to uninstall this package 
-dotnet new --uninstall
-
-###### Uninstall template
-dotnet new --uninstall Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution
+Once you install the Nuget package you will see three files added to you project  
+Clean Architecture Database Access Generator.tt  
+Clean Architecture WebAPI Generator.tt  
+T4Helper.ttinclude  
+###### Change the Custom Tool property to TextTemplatingFileGenerator on the above .tt files to generate you projects  
 
 ---
 ## This project has two T4Templates

@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Thomson Mathews</Authors>
-    <Version>1.1.5</Version>
+    <Version>1.1.7</Version>
     <PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
@@ -40,15 +40,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Clean Architecture WebAPI Generator.tt</DependentUpon>
     </Content>
-    <Content Include="T4Helper.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>T4Helper.ttinclude</DependentUpon>
-    </Content>
-    <Content Include="T4Helper.ttinclude">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4Helper.cs</LastGenOutput>
-    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".template.config\template.json" />
   </ItemGroup>
 
   <ItemGroup>
