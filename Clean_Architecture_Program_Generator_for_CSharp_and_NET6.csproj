@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Thomson Mathews</Authors>
-    <Version>1.0.9</Version>
+    <Version>1.1.0</Version>
     <PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
