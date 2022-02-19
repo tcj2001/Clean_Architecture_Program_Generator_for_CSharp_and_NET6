@@ -6,7 +6,7 @@ Application project will contain interfaces for the services and its implementai
 Persistence project will contain ApplicationDbContext, implemetaion for repositories and UnitOfWork, along with Repository Manager
 WebAPI project will contain Controllers for the the entities  
 
-**When you add additional Entities in the Domain Project, running this templates will automatically genarate all required Repositories, Services and Controller** 
+**When you add additional Entities in the Domain Project, running this templates will automatically genarate all required Repositories, Services and Controllers** 
 
 ---
 ## Table of Contents
