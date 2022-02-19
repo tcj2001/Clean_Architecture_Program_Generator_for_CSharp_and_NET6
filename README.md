@@ -11,7 +11,7 @@
 5. [How to check if this really works](#HTCITRW)
 6. [Some useful commands](#SUC)
 ---
-## Github Link<a name="GithubLink"></a>
+## Github Link
  
 https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6
 
@@ -98,7 +98,7 @@ Contains classes structure to read from appsettings.json file
 ##### Once you add more entities, you can run this template again to generate controllers for the new Entities in the WebAPI Project
 
 ---
-## How to check if this really works<a name=HTCITRW></a>
+## How to check if this really works
 Once all the projects are generated using the T4Templates  
 By default Domain project will contains one entity named Sample.cs, it also generated Repository and Services for sample entity  
 
