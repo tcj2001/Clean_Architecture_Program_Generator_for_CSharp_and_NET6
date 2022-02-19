@@ -9,24 +9,21 @@
 		<RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Authors>Thomson Mathews</Authors>
-		<Version>1.3.5</Version>
+		<Version>1.4.4</Version>
 		<PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Description>This is a clean architecture project code generator which will generate repositories, services for each defined enitities along with unitofwork, it will also generate controllers for each entity in the WebAPI project</Description>
-		<PackageTags>Clean Architecture" Template WebAPI Web Repostory UnitOfWork Services Code Generator</PackageTags>
+
 		<IncludeContentInPack>true</IncludeContentInPack>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<Description>This is a clean architecture project code generator which will generate repositories, services for each defined enitities along with unitofwork, it will also generate controllers for each entity in the WebAPI project</Description>
+		<PackageTags>Clean Architecture" Template WebAPI Web Repostory UnitOfWork Services Code Generator</PackageTags>
 
-		<ContentTargetFolders>content</ContentTargetFolders>
-		<NoWarn>$(NoWarn);NU5128</NoWarn>
 	</PropertyGroup>
 
-
 	<ItemGroup>
-		<Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
+		<Content Include="templates\**\*.tt;templates\**\*.ttinclude" Exclude="templates\**\bin\**;templates\**\obj\**;templates\**\*" />
 		<Compile Remove="**\*" />
 	</ItemGroup>
-
 
 	<ItemGroup>
 		<Content Include="README.md">
@@ -35,5 +32,46 @@
 		</Content>
 	</ItemGroup>
 
-</Project>
+	<ItemGroup>
+		<None Include="templates\.template.config\template.json" />
+	</ItemGroup>
 
+	<ItemGroup>
+		<Content Include="templates\Clean Architecture Database Access Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
+			<Pack>True</Pack>
+		</Content>
+		<Content Include="templates\Clean Architecture WebAPI Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
+			<Pack>True</Pack>
+		</Content>
+		<Content Include="templates\T4Helper.ttinclude">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>T4Helper.cs</LastGenOutput>
+			<Pack>True</Pack>
+		</Content>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<None Include="templates\Clean Architecture Database Access Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
+		</None>
+		<None Include="templates\Clean Architecture WebAPI Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
+		</None>
+		<None Include="templates\T4Helper.ttinclude">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>T4Helper.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+</Project>

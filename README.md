@@ -1,24 +1,58 @@
 ﻿# Clean Architecture Solution Program Generator
 ---
-Github Link   
+# Table of Contents
+1. [Github Link](#GithubLink)
+2. [Installing using Nuget Package Manager](#NPM)
+3. [Installing as a Template](#IAT)
+4. Installed Files
+    1. [Clean Architecture Database Access Generator.tt](#CADAG)
+    2. [Clean Architecture WebAPI Generator.tt](#CAWEBAPIG)
+    3. [T4Helper.ttinclude](#helper) 
+5. [How to check if this really works](#HTCITRW)
+6. [Some useful commands](#SUC)
+---
+## Github Link<a name="GithubLink"></a>
+ 
 https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6
 
 ---
+## Installing using Nuget Package Manager<a name="NPM"></a>
 ##### Installation Procedure   
 Create a ClassLibrary or a Console Project, make sure the project name is different from the solution name or uncheck "Place solution and project in the same diectory"  
 
 Install Nuget Package  
 ##### Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution  
 
-Once you install the Nuget package you will see three files added to your project  
+Once you install the Nuget package you will see three files added to your project under templates folder 
 ###### Clean Architecture Database Access Generator.tt  
 ###### Clean Architecture WebAPI Generator.tt  
 ###### T4Helper.ttinclude  
 ###### Change the Custom Tool property to **TextTemplatingFileGenerator** on the above .tt files to generate your projects as detailed in the following section
 
 ---
+## Installing as a Template<a name="IAT"></a>
+Another way to install this as a **template** is to use package manager console  
+###### dotnet new -i Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution  
+This will add a new template in your donet cli environment
 
-####  Clean Architecture Database Access Generator Template.tt
+###### dotnet new -l  
+this will show a entry like this  
+###### Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution  CA_PG_C#_NET6_SOL    [C#]        Web/ASP.NET/Clean Architecture         
+**CA_PG_C#_NET6_SOL** is shortname for the template  
+
+To use this listed template  
+
+Create a ClassLibrary or a Console Project, make sure the project name is different from the solution name or uncheck "Place solution and project in the same diectory"    
+from the the package manager console, change directory to the project folder and run this command  
+###### dotnet new CA_PG_C#_NET6_SOL     
+This will add three files 
+###### Clean Architecture Database Access Generator.tt  
+###### Clean Architecture WebAPI Generator.tt  
+###### T4Helper.ttinclude  
+to your project
+
+---
+## Clean Architecture Database Access Generator.tt<a name=CADAG></a>
 This template will generate 4 projects:  
 Domain, Application, Persistence, Startup
 
@@ -41,8 +75,7 @@ Startup project is only used to run Entity framework commands with out a WebAPI 
 ##### Once you add more entities, you can run this template again to generate repository interfaces for the new Entities in the Domain Project, repository implementation for the new Entities in Persistence Project and Services and its Service interfaces for the new Entities in the Application Project
 
 ---
-
-####  Clean Architecture WebAPI Generator Template.tt
+## Clean Architecture WebAPI Generator Template.tt<a name=CAWEBAPIG></a>
 This template will generate open a dialog box, select ASP.NET Core WebAPI project and it will create a project named **WebAPI**
 ##### WebAPI Project:  
 
@@ -65,10 +98,9 @@ Contains classes structure to read from appsettings.json file
 ##### Once you add more entities, you can run this template again to generate controllers for the new Entities in the WebAPI Project
 
 ---
-#### How to check if this really works
+## How to check if this really works<a name=HTCITRW></a>
 Once all the projects are generated using the T4Templates  
-Note: Startup project is only used to run Entity framework commands with out a WebAPI project and is not required if WebAPI project is generated  
-By default Domain project contains one entity named Sample.cs, it also generated Repository and Services for sample entity  
+By default Domain project will contains one entity named Sample.cs, it also generated Repository and Services for sample entity  
 
 Set WebAPI as you startup project
 
@@ -94,8 +126,11 @@ Set WebAPI as a startup project and run it
 By default the WebAPI uses BasicAuthentication the userid and password is defined in the appsettings.json file  
 
 ---
+## T4Helper.ttinclude<a name="helper"></a>
+This file contains function used by the above T4Template files
 
-##### Some useful commands  
+---
+## Some useful commands<a name="SUC"></a>
 
 ##### Code First Migrations  
 dotnet ef migrations add "initialmigration1" --project Persistence --startup-project Startup  
