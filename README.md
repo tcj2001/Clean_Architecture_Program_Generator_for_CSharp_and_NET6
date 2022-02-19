@@ -1,5 +1,9 @@
 ﻿# Clean Architecture Solution Program Generators
 ---
+Github Link   
+https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6
+
+---
 ##### Installation Procedure   
 Create a ClassLibrary or a Console Project, make sure the project name is different from the solution name or uncheck "Place solution and project in the same diectory"  
 
@@ -19,7 +23,7 @@ This template will generate 4 projects:
 Domain, Application, Persistence, Startup
 
 Application Project refers Domain project  
-Persistence Project refers Applicaions Project  
+Persistence Project refers Applications Project  
 Startup or WebApi Project refers Application Project for business logic and Persistence project to activate Dbcontext  
 
 ##### Domain Project:  
@@ -27,9 +31,9 @@ Define all entities in Entities folder, either using code first approach or data
 ##### Application Project:   
 Defines Interface for ServiceManager in the Interfaces folder, will also generate repository interface for each entity defined in the Domain project. ServiceManger is implemented in the Services Folder, it will also contain Services for each entities defined in the Domain project
 ##### Persistence Project:   
-ApplicationDbContext should be defined or generated using Entity Framework in the context folder, Repostories folder contains GenericRepository, RepositoryManager and UnitOfWork implementation
+ApplicationDbContext should be defined or generated using Entity Framework in the context folder, Repositories folder contains GenericRepository, RepositoryManager and UnitOfWork implementation
 ##### Startup Projects:   
-This is a console application that will create a Generic Host which will help in dependency injection, here ApplicationDbContext is added to the ServiceCollection, this project will help you to run Entityframe work commands to do entity migrations to a database or generate entities and ApplicationDbContext from exising database  
+This is a console application that will create a Generic Host which will help in dependency injection, here ApplicationDbContext is added to the ServiceCollection, this project will help you to run Entity framework commands to do entity migrations to a database or generate entities and ApplicationDbContext from existing database  
 
 Startup project is only used to run Entity framework commands with out a WebAPI project and is not required if WebAPI project is generated  
 
@@ -39,21 +43,21 @@ Startup project is only used to run Entity framework commands with out a WebAPI 
 ---
 
 ####  Clean Architecture WebAPI Generator Template.tt
-This template will generate open a dialog box, select ASP.NET Core WebAPI project and will create a project named **WebAPI**
+This template will generate open a dialog box, select ASP.NET Core WebAPI project and it will create a project named **WebAPI**
 ##### WebAPI Project:  
 
 Controller Folder:  
-Will contain generated controller for each entities defined in Domain project
+Contains generated controller for each entities defined in Domain project
 
 Extensions Folder:  
-Will contain extension for adding ServiceManager dependency, RepositoryManger dependency, AddplicationDBcontext dependency and Extension method to add BasicAuthMiddleware to the HTTP request pipeline  
+Contains extension for adding ServiceManager dependency, RepositoryManger dependency, AddplicationDBcontext dependency and Extension method to add BasicAuthMiddleware to the HTTP request pipeline  
 Modify AddPersistenceExtension class in this folder to refer to correct connection string
 
 MiddleWare Folder:   
 Contains implementation for BasicAuthMiddleware and ExceptionHandlingMiddleware
 
 Appsetting.json:   
-Contains configuration for serilog logging, connection string and basic authentication details
+Contains configuration for Serilog logging, connection string and basic authentication details
 
 Appsetting Folder:   
 Contains classes structure to read from appsettings.json file
@@ -64,14 +68,15 @@ Contains classes structure to read from appsettings.json file
 #### How to check if this really works
 Once all the projects are generated using the T4Templates  
 Note: Startup project is only used to run Entity framework commands with out a WebAPI project and is not required if WebAPI project is generated  
-By default Domain project contains one entity named Sample.cs, it also generated Repostory and Services for sample entity  
+By default Domain project contains one entity named Sample.cs, it also generated Repository and Services for sample entity  
+
 Set WebAPI as you startup project
 
 *For code first approach*  
-Let create a Sqlite database to hold a table for Sample entity in app.db by running these commands  
+Let create a SQLite database to hold a table for Sample entity in app.db by running these commands  
 ###### dotnet ef migrations add "initialmigration2" --project Persistence --startup-project WebAPI  
 ###### dotnet ef database update --project Persistence --startup-project WebAPI  
-This will create App.db in WebAPI folder with a table Sample  
+This will create App.db in WebAPI folder with a table named Sample  
 Make sure class AddPersistenceExtension in WebAPI project Extensions Folder has  
 services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=SqliteDb"));
 
@@ -90,7 +95,7 @@ By default the WebAPI uses BasicAuthentication the userid and password is define
 
 ---
 
-##### Some usefull commands
+##### Some useful commands  
 
 ##### Code First Migrations  
 dotnet ef migrations add "initialmigration1" --project Persistence --startup-project Startup  
