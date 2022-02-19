@@ -1,4 +1,13 @@
-﻿# Clean Architecture Solution Program Generator<a name="caspg"></a>
+﻿# Clean Architecture Solution Program Generator
+This will install templates that allows to generate clean architecture project structure within your solution containing Domain, Application, Persistence, WebAPI projects  
+
+Domain project will contain by default an sample entity and intefaces for repositories, unitOfWork  
+Application project will contain interfaces for the services and its implementaion along with Service Manager
+Persistence project will contain ApplicationDbContext, implemetaion for repositories and UnitOfWork, along with Repository Manager
+WebAPI project will contain Controllers for the the entities  
+
+**When you add additional Entities in the Domain Project, running this templates will automatically genarate all required Repositories, Services and Controller** 
+
 ---
 ## Table of Contents
 - [Clean Architecture Solution Program Generator](#clean-architecture-solution-program-generator)
