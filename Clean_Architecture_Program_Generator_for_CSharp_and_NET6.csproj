@@ -25,29 +25,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Include="T4Helper.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>T4Helper.ttinclude</DependentUpon>
-		</Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="Clean Architecture Database Access Generator.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
-			<Pack>True</Pack>
-		</Content>
-		<Content Include="Clean Architecture WebAPI Generator.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
-			<Pack>True</Pack>
-		</Content>
-		<Content Include="T4Helper.ttinclude">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>T4Helper.cs</LastGenOutput>
-			<Pack>True</Pack>
-		</Content>
 		<Content Include="README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
@@ -55,7 +32,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include=".template.config\template.json" />
+		<None Include="Content\.template.config\template.json" />
 	</ItemGroup>
 
 
@@ -64,11 +41,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Clean Architecture Database Access Generator.txt">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>Clean Architecture Database Access Generator.tt</DependentUpon>
-	  </None>
 	  <None Update="Clean Architecture WebAPI Generator.txt">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
