@@ -15,13 +15,5 @@
   "name":"Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution",
   "shortName":"CA_PG_C#_NET6_SOL",
   "sourceName":"Clean.Architecture",
-  "preferNameDirectory":true,
-  "sources": [
-      {
-        "modifiers": [
-          { "exclude": [ ".vs/**", ".template_config/**", ".git/**", "bin/**", "obj/**", ".git*", "*.txt" ] },
-          { "include": [ "*.tt", "*.ttinclude" ] }
-        ]
-      }
-    ]
+  "preferNameDirectory":true
 }
