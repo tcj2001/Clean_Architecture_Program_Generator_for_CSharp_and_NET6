@@ -1,4 +1,4 @@
-﻿# Clean Architecture Solution Program Generators
+﻿# Clean Architecture Solution Program Generator
 ---
 Github Link   
 https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6
