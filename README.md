@@ -58,7 +58,7 @@ There are **two way** to use the template
 First Method  
 Go to a directory where you want to make use of the template  
 **dotnet new CA_PG_C#_NET6_SOL -o YourProjectFolderName**  
-This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within the soution
+This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within the solution
 
 Second Method  
 When you select new project in visual studio you will see a template named Clean_Architecture_Program_Generator_for_CSharp_and_NET6, if you don't see filter the project type and select Clean Architecture, select this template and create your project   
