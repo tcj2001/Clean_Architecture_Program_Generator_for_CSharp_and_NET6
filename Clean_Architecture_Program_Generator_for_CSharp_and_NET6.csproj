@@ -9,7 +9,7 @@
 		<RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Authors>Thomson Mathews</Authors>
-		<Version>1.4.7</Version>
+		<Version>1.5.4</Version>
 		<PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 
@@ -21,57 +21,69 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
-		<Compile Remove="**\*" />
+		<None Update="Clean Architecture Database Access Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Clean Architecture Database Access Generator.txt">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Clean Architecture Database Access Generator.tt</DependentUpon>
+		</None>
+		<None Update="Clean Architecture WebAPI Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Clean Architecture WebAPI Generator.txt">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Clean Architecture WebAPI Generator.tt</DependentUpon>
+		</None>
+		<None Update="T4Helper.ttinclude">
+		    <Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+
+		<None Update="README.md">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="**\*" Exclude="**\bin\**;**\obj\**;.vs\**;.git\**;*.txt;*.cs; *.sln;" />
+		<Compile Remove="**\*" />
+		<Content Include="Clean Architecture Database Access Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<Pack>True</Pack>
+			<LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Clean Architecture WebAPI Generator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<Pack>True</Pack>
+			<LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="T4Helper.ttinclude">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<Pack>True</Pack>
+			<LastGenOutput>T4Helper.cs</LastGenOutput>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 		<Content Include="README.md">
 			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="templates\.template.config\template.json" />
+	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="templates\Clean Architecture Database Access Generator.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
-			<Pack>True</Pack>
-		</Content>
-		<Content Include="templates\Clean Architecture WebAPI Generator.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
-			<Pack>True</Pack>
-		</Content>
-		<Content Include="templates\T4Helper.ttinclude">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>T4Helper.cs</LastGenOutput>
-			<Pack>True</Pack>
-		</Content>
-	</ItemGroup>
-
-
-	<ItemGroup>
-		<None Include="templates\Clean Architecture Database Access Generator.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
-		</None>
-		<None Include="templates\Clean Architecture WebAPI Generator.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
-		</None>
-		<None Include="templates\T4Helper.ttinclude">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>T4Helper.cs</LastGenOutput>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	  <Compile Update="T4Helper.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>T4Helper.ttinclude</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 </Project>

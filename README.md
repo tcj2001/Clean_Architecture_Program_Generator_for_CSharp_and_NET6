@@ -34,10 +34,11 @@ Create a ClassLibrary or a Console Project, make sure the project name is differ
 Install Nuget Package  
 **Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution**  
 
-Once you install the Nuget package you will see three files added to your project under templates folder  
+Once you install the Nuget package you will see three required files added to your project  
 **Clean Architecture Database Access Generator.tt**  
 **Clean Architecture WebAPI Generator.tt**  
 **T4Helper.ttinclude**  
+Rest of them you can ignore
 
 *Change the Custom Tool property to **TextTemplatingFileGenerator** on the above .tt files to generate your projects as detailed in the following section*  
 
@@ -48,20 +49,20 @@ Another way to install this as a **template** is to use package manager console
 This will add a new template in your donet cli environment  
 
 **dotnet new -l**  
-this will show a entry like this  
+will show a entry like this, to confrim the template was installed 
 **Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution  CA_PG_C#_NET6_SOL    [C#]        Web/ASP.NET/Clean Architecture**         
 **CA_PG_C#_NET6_SOL** is shortname for the template  
 
-To use this listed template  
+There are **two way** to use the template
 
-Create a ClassLibrary or a Console Project, make sure the project name is different from the solution name or uncheck "Place solution and project in the same diectory"    
-from the the package manager console, change directory to the project folder and run this command  
-**dotnet new CA_PG_C#_NET6_SOL**     
-This will add three files  
-**Clean Architecture Database Access Generator.tt**  
-**Clean Architecture WebAPI Generator.tt**  
-**T4Helper.ttinclude**  
-to your project  
+First Method  
+Go to a directory where you want to make use of the template  
+**dotnet new CA_PG_C#_NET6_SOL -o YourProjectFolderName**  
+This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within the soution
+
+Second Method  
+When you select new project in visual studio you will see a template named Clean_Architecture_Program_Generator_for_CSharp_and_NET6, if you don't see filter the project type and select Clean Architecture, select this template and create your project   
+This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within YourProjectFolderName    
 
 ---
 ## Clean Architecture Database Access Generator.tt
