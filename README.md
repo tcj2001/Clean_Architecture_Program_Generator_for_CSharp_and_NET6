@@ -18,28 +18,28 @@ Program Generator to **generate** Clean Architecture base project structure solu
 
 ---
 # Getting Started
-This is a Nuget package should be installed as a template in dotnet cli
-![Nuget Package](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/NugetPackage.png)  
+This is a Nuget package should be installed as a template in dotnet cli.  
+![Nuget Package](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/NugetPackage.png?raw=true)  
 
 This will install two template files in your project.  
 [Clean Architecture Database Access Generator.tt](#clean-architecture-database-access-generator.tt)  
 [Clean Architecture WebAPI Generator.tt](#clean-architecture-webapi-generator.tt)  
-![Template Project](_images/TemplateProject.png)
+![Template Project](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/TemplateProject.png?raw=true)
 
 Once these template files are installed.   
 
 Run the all templates using "Transform All T4 Templates" from the build menu.  
-![Run Templates](_images/RunTemplates.png)  
+![Run Templates](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/RunTemplates.png?raw=true)  
 
 or
 Run individual template by right click on the template and select "Run Custom Tool"
-![Run Templates2](_images/RunTemplates2.png)
+![Run Templates2](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/RunTemplates2.png?raw=true)
 
 This will generate the following projects.  
-![Generated Projects](_images/GeneratedProjects.png)  
+![Generated Projects](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/GeneratedProjects.png?raw=true)  
 
 Now define entities in the Domain Project using code first approach or database first approach 
-![Entities Folder](_images/EntitiesFolder.png)  
+![Entities Folder](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/EntitiesFolder.png?raw=true)  
 and run the transformation again.  
 
 **Voila! all repositories, services and controller are generated for you by the templates.**  
@@ -50,22 +50,22 @@ Now just set WebAPI as a startup project and run it, that's it.
 ## Clean Architecture Database Access Generator.tt
 This template will generate 4 projects:  
 Domain, Application, Persistence, Startup.  
-![Generated Projects1](_images/GeneratedProjects1.png)  
+![Generated Projects1](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/GeneratedProjects1.png?raw=true)  
 **Domain Project:**  
 Define all entities in Entities folder, either using code first approach or database approach, Exceptions folder defines some basic usefull exceptions that can be used in global error handling, Interface folder contains GenreicRepository, RepositoryManager and UnitOfWork interfaces that is impletmented in the Persistence project.  
-![Domain Project](_images/DomainProject.png)  
+![Domain Project](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/DomainProject.png?raw=true)  
 
 **Application Project**  
 Defines Interface for ServiceManager in the Interfaces folder, will also generate repository interface for each entity defined in the Domain project. ServiceManger is implemented in the Services Folder, it will also contain Services for each entities defined in the Domain project.  
-![Application Project](_images/ApplicationProject.png)  
+![Application Project](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/ApplicationProject.png?raw=true)  
 
 **Persistence Project:**     
 ApplicationDbContext should be defined or generated using Entity Framework in the context folder, Repositories folder contains GenericRepository, RepositoryManager and UnitOfWork implementation.  
-![Persistence Project](_images/PersistenceProject.png)  
+![Persistence Project](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/PersistenceProject.png?raw=true)  
 
 **Startup Projects:**  
 This is a console application that will create a Generic Host which will help in dependency injection, here ApplicationDbContext is added to the ServiceCollection, this project will help you to run Entity framework commands to do entity migrations to a database or generate entities and ApplicationDbContext from existing database.  
-![Startup Project](_images/StartupProject.png)  
+![Startup Project](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/StartupProject.png?raw=true)  
 Startup project is only used to run Entity framework commands with out a WebAPI project and is not required if WebAPI project is generated.  
 
 *Once you add more entities, you can **run this template again to generate** repository interfaces for the new Entities in the Domain Project, repository implementation for the new Entities in Persistence Project and Services and its Service interfaces for the new Entities in the Application Project*.  
@@ -73,10 +73,10 @@ Startup project is only used to run Entity framework commands with out a WebAPI 
 ---
 ## Clean Architecture WebAPI Generator.tt
 This template will generate open a dialog box, select ASP.NET Core WebAPI project and it will create a project named **WebAPI**
-![Dialog Box](_images/DialogBox.png)  
+![Dialog Box](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/DialogBox.png?raw=true)  
 
 **WebAPI Project:**  
-![Generated Projects2](_images/GeneratedProjects2.png)  
+![Generated Projects2](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/GeneratedProjects2.png?raw=true)  
 
 **Controller Folder:**  
 Contains generated controller for each entities defined in Domain project.  
@@ -84,7 +84,7 @@ Contains generated controller for each entities defined in Domain project.
 **Extensions Folder:**  
 Contains extension for adding ServiceManager dependency, RepositoryManger dependency, AddplicationDBcontext dependency and Extension method to add BasicAuthMiddleware to the HTTP request pipeline.    
 Modify AddPersistenceExtension class in this folder to refer to correct connection string.  
-![Add Persistence Extension1](_images/AddPersistenceExtension1.png)  
+![Add Persistence Extension1](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/AddPersistenceExtension1.png?raw=true)  
 
 **MiddleWare Folder:**     
 Contains implementation for BasicAuthMiddleware and ExceptionHandlingMiddleware.  
@@ -95,7 +95,7 @@ Contains configuration for Serilog logging, connection string and basic authenti
 **Appsetting Folder:**   
 Contains classes structure to read from appsettings.json file.    
 
-![Web A P I Project](_images/WebAPIProject.png)  
+![Web A P I Project](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/WebAPIProject.png?raw=true)  
 
 *Once you add more entities, you can **run this template again to generate** controllers for the new Entities in the WebAPI Project.*  
 
@@ -112,11 +112,11 @@ https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_N
 From your package manager console.  
 **dotnet new -i Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution**  
 This will add a new template in your donet cli environment.  
-![Template](_images/Template.png)  
+![Template](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/Template.png?raw=true)  
 
 **dotnet new -l**  
 you can use the above command to check if the template was installed. 
-![Check Template](_images/CheckTemplate.png)  
+![Check Template](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/CheckTemplate.png?raw=true)  
 
 **CA_PG_C#_NET6_SOL** is shortname for the template
 
@@ -125,17 +125,17 @@ There are **two way** to use the template.
 **First Method**.  
 Go to a directory where you want to make use of the template and type command.   
 **dotnet new CA_PG_C#_NET6_SOL -o YourProjectFolderName** 
-![First Method1](_images/FirstMethod1.png)  
+![First Method1](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/FirstMethod1.png?raw=true)  
 
 This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within the solution  
-![First Method2](_images/FirstMethod2.png)  
+![First Method2](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/FirstMethod2.png?raw=true)  
 
 **Second Method**.  
 When you select new project in visual studio you will see a template named Clean_Architecture_Program_Generator_for_CSharp_and_NET6, if you don't see filter the project type and select Clean Architecture, select this template and create your project.   
-![Second Method1](_images/SecondMethod1.png)  
+![Second Method1](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/SecondMethod1.png?raw=true)  
 
 This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within YourProjectFolderName.    
-![Second Method2](_images/SecondMethod2.png)  
+![Second Method2](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/SecondMethod2.png?raw=true)  
 
 ---
 ## How to check if this really works
@@ -143,55 +143,55 @@ Once all the projects are generated using the T4Templates
 By default Domain project will contains one entity named Sample.cs, it also generated Repository and Services for sample entity.  
 The classes highlited in green will get generated for **each entity** defined in the Domain project entities folder
 The Classes highlighted in red gets re-generated every time with entity details
-![Generated Classes](_images/GeneratedClasses.png)  
+![Generated Classes](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/GeneratedClasses.png?raw=true)  
 
 ## Code First approach 
 Since we already have a sample entity defined for you by the template, I will just make use of it.   
 Just for simplicity let's create a SQLite database to hold a table for Sample entity in app.db by running these commands.  
 **dotnet ef migrations add "initialmigration2" --project Persistence --startup-project WebAPI**    
 **dotnet ef database update --project Persistence --startup-project WebAPI**  
-![Code First](_images/CodeFirst.png)  
+![Code First](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/CodeFirst.png?raw=true)  
 This will create App.db in WebAPI folder with a table named Sample.  
 
 In the appsettings.json we already have two connections string pre-defined.  
-![Appsettings Connectionstring](_images/appsettingsConnectionstring.png)
+![Appsettings Connectionstring](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/appsettingsConnectionstring.png?raw=true)
 
 Make sure class AddPersistenceExtension in WebAPI project Extensions Folder has  
 services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=SqliteDb"));
-![Add Persistence Extension2](_images/AddPersistenceExtension2.png)  
+![Add Persistence Extension2](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/AddPersistenceExtension2.png?raw=true)  
 
 **Set WebAPI as a startup project and run it.**  
-![Code First Output](_images/CodeFirstOutput.png)
+![Code First Output](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/CodeFirstOutput.png?raw=true)
 
 ## Database First approach
 Here we will make use of a BookStores database in my Sql Server setup.  
-![Appsettings Connectionstring](_images/appsettingsConnectionstring.png)
+![Appsettings Connectionstring](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/appsettingsConnectionstring.png?raw=true)
 
 Make sure class AddPersistenceExtension in WebAPI project Extensions Folder has   
 services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDb"))
-![Add Persistence Extension3](_images/AddPersistenceExtension3.png)  
+![Add Persistence Extension3](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/AddPersistenceExtension3.png?raw=true)  
 
 Run this command with a connection string pointing to your Sql Server Database.  
 **scaffold-DbContext -Connection "Name=SqlServerDb" -Provider Microsoft.EntityFrameworkCore.SqlServer -Project Persistence -StartupProject WebAPI -OutputDir ..\Domain\Entities -Context ApplicationDbContext -ContextDir ..\Persistence\Context -Namespace Domain.Entities -ContextNamespace Persistence.Context -DataAnnotations -force**  
-![Databse First1](_images/DatabseFirst1.png)
+![Databse First1](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/DatabseFirst1.png?raw=true)
 
 This will generate all entities in domain project  
-![Databse First2](_images/DatabseFirst2.png)
+![Databse First2](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/DatabseFirst2.png?raw=true)
 
 Run all templates 
-![Run Templates](_images/RunTemplates.png)  
+![Run Templates](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/RunTemplates.png?raw=true)  
 or individual template
-![Run Templates2](_images/RunTemplates2.png)
+![Run Templates2](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/RunTemplates2.png?raw=true)
 
 All repositories, services and controllers are generated for you.  
-![Databse First3](_images/DatabseFirst3.png)
-![Databse First4](_images/DatabseFirst4.png)
+![Databse First3](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/DatabseFirst3.png?raw=true)
+![Databse First4](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/DatabseFirst4.png?raw=true)
 
 Set WebAPI as a startup project and run it.  
-![Database First Output](_images/DatabaseFirstOutput.png)   
+![Database First Output](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/DatabaseFirstOutput.png?raw=true)   
 
 By default the WebAPI uses BasicAuthentication the userid and password is defined in the appsettings.json file  
-![Basic Authentication Credentials](_images/BasicAuthenticationCredentials.png)
+![Basic Authentication Credentials](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/BasicAuthenticationCredentials.png?raw=true)
 
 ---
 ## Some useful commands
