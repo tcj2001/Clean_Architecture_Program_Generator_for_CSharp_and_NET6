@@ -18,8 +18,8 @@ Program Generator to **generate** Clean Architecture base project structure solu
 
 ---
 # Getting Started
-This is a Nuget package should be installed as a template in dotnet cli.  
-You can browse this package using manage nuget packages by searching for "Thomson Mathews" or "Clean_Architecture_Program_Generator_for_CSharp_and_NET6"  
+This is a NuGet package should be installed as a template in dotnet cli.  
+You can browse this package using manage NuGet packages by searching for "Thomson Mathews" or "Clean_Architecture_Program_Generator_for_CSharp_and_NET6"  
 ![Imgur](https://i.imgur.com/9N0loaV.png)  
 This will install two template files in your project.  
 [Clean Architecture Database Access Generator.tt](#clean-architecture-database-access-generator.tt)  
@@ -50,7 +50,7 @@ Domain, Application, Persistence, Startup.
 ![Imgur](https://i.imgur.com/IqyphaF.png)  
 
 **Domain Project:**  
-Define all entities in Entities folder, either using code first approach or database approach, Exceptions folder defines some basic usefull exceptions that can be used in global error handling, Interface folder contains GenreicRepository, RepositoryManager and UnitOfWork interfaces that is impletmented in the Persistence project.  
+Define all entities in Entities folder, either using code first approach or database approach, Exceptions folder defines some basic useful exceptions that can be used in global error handling, Interface folder contains GenreicRepository, RepositoryManager and UnitOfWork interfaces that is implemented in the Persistence project.  
 ![Imgur](https://i.imgur.com/i7ZTVsl.png)  
 
 **Application Project**  
@@ -114,7 +114,7 @@ https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_N
 ## Installing template from Nuget Package Manager
 From your package manager console.  
 **dotnet new -i Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution**  
-This will add a new template in your donet cli environment.  
+This will add a new template in your dotnet cli environment.  
 ![Imgur](https://i.imgur.com/7Z6Ixu9.png)  
 
 **dotnet new -l**  
@@ -144,8 +144,8 @@ This will create a ClassLibrary project named Clean_Architecture_Program_Generat
 ## How to check if this really works
 Once all the projects are generated using the T4Templates  
 By default Domain project will contains one entity named Sample.cs, it also generated Repository and Services for sample entity.  
-The classes highlited in green will get generated for **each entity** defined in the Domain project entities folder
-The Classes highlighted in red gets re-generated every time with entity details
+The classes highlighted in green will get generated for **each entity** defined in the Domain project entities folder.    
+The Classes highlighted in red gets re-generated every time with entity details.  
 ![Imgur](https://i.imgur.com/9AAuzNp.png)  
 
 ## Code First approach 
@@ -169,7 +169,8 @@ services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=S
 
 
 ## Database First approach
-Here we will make use of a BookStores database in my Sql Server setup.  
+Here we will make use of a BookStores database in my Sql Server setup. 
+This database was grabbed from internet, credit goes to the person who made it available for community.
 ![Imgur](https://i.imgur.com/7mh67uJ.png)  
 
 Make sure class AddPersistenceExtension in WebAPI project Extensions Folder has   
