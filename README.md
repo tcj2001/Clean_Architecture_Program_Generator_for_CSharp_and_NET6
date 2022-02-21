@@ -19,7 +19,7 @@ Program Generator to **generate** Clean Architecture base project structure solu
 ---
 # Getting Started
 This is a Nuget package should be installed as a template in dotnet cli
-![Nuget Package](_images/NugetPackage.png)  
+![Nuget Package](https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6/blob/master/_images/NugetPackage.png)  
 
 This will install two template files in your project.  
 [Clean Architecture Database Access Generator.tt](#clean-architecture-database-access-generator.tt)  
@@ -27,8 +27,10 @@ This will install two template files in your project.
 ![Template Project](_images/TemplateProject.png)
 
 Once these template files are installed.   
+
 Run the all templates using "Transform All T4 Templates" from the build menu.  
 ![Run Templates](_images/RunTemplates.png)  
+
 or
 Run individual template by right click on the template and select "Run Custom Tool"
 ![Run Templates2](_images/RunTemplates2.png)
@@ -37,7 +39,7 @@ This will generate the following projects.
 ![Generated Projects](_images/GeneratedProjects.png)  
 
 Now define entities in the Domain Project using code first approach or database first approach 
-![Entities Folder](_images/EntitiesFolder.png)
+![Entities Folder](_images/EntitiesFolder.png)  
 and run the transformation again.  
 
 **Voila! all repositories, services and controller are generated for you by the templates.**  
@@ -125,7 +127,7 @@ Go to a directory where you want to make use of the template and type command.
 **dotnet new CA_PG_C#_NET6_SOL -o YourProjectFolderName** 
 ![First Method1](_images/FirstMethod1.png)  
 
-This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within the solution
+This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within the solution  
 ![First Method2](_images/FirstMethod2.png)  
 
 **Second Method**.  
