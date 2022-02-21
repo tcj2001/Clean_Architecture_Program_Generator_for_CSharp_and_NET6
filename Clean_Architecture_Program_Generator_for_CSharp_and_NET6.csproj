@@ -86,4 +86,8 @@
 	  </Compile>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="_images\" />
+	</ItemGroup>
+
 </Project>

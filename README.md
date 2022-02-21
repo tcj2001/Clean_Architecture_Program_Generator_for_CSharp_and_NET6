@@ -1,14 +1,17 @@
 ﻿# Clean Architecture Solution Program Generator
-This will install templates that allows to generate clean architecture project structure within your solution containing Domain, Application, Persistence, WebAPI projects  
+This will install templates that allows to generate clean architecture project structure within your solution containing Domain, Application, Persistence, WebAPI projects.  
 
-Domain project will contain by default an sample entity and intefaces for repositories, unitOfWork  
-Application project will contain interfaces for the services and its implementaion along with Service Manager
-Persistence project will contain ApplicationDbContext, implemetaion for repositories and UnitOfWork, along with Repository Manager
-WebAPI project will contain Controllers for the the entities  
+Domain project will contain by default an sample entity and intefaces for repositories, unitOfWork.  
+Application project will contain interfaces for the services and its implementaion along with Service Manager.  
+Persistence project will contain ApplicationDbContext, implemetaion for repositories and UnitOfWork, along with Repository Manager.  
+WebAPI project will contain Controllers for the the entities.  
 
 **When you add additional Entities in the Domain Project, running this templates will automatically genarate all required Repositories, Services and Controllers** 
+![Generated Solution Structure](_images/GeneratedSolutionStructure.png)  
+
 
 ---
+
 ## Table of Contents
 - [Clean Architecture Solution Program Generator](#clean-architecture-solution-program-generator)
 - [Github Link](#github-link)
@@ -40,7 +43,7 @@ Once you install the Nuget package you will see three required files added to yo
 **T4Helper.ttinclude**  
 Rest of them you can ignore
 
-*Change the Custom Tool property to **TextTemplatingFileGenerator** on the above .tt files to generate your projects as detailed in the following section*  
+*Change the Custom Tool property to **TextTemplatingFileGenerator** on the above .tt files to generate all projects*  
 
 ---
 ## Installing as a Template
@@ -63,6 +66,8 @@ This will create a ClassLibrary project named Clean_Architecture_Program_Generat
 Second Method  
 When you select new project in visual studio you will see a template named Clean_Architecture_Program_Generator_for_CSharp_and_NET6, if you don't see filter the project type and select Clean Architecture, select this template and create your project   
 This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within YourProjectFolderName    
+
+*Change the Custom Tool property to **TextTemplatingFileGenerator** on the above .tt files to generate all projects*  
 
 ---
 ## Clean Architecture Database Access Generator.tt
