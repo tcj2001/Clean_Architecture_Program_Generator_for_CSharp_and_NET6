@@ -98,7 +98,7 @@ Contains classes structure to read from appsettings.json file.
 **Program.cs**
 This connect all the wiring between the projects.
 ![Imgur](https://i.imgur.com/QBq9PMJ.png)  
-[Imgur](https://i.imgur.com/v1JkFNe.png)  
+![Imgur](https://i.imgur.com/v1JkFNe.png)  
 
 *Once you add more entities, you can **run this template again to generate** controllers for the new Entities in the WebAPI Project.*  
 
