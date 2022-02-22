@@ -13,9 +13,9 @@
 <#@ import namespace="System.Reflection" #>
 <#
     /////////////////////////////
-    // Generate WebAPI project //
+    // Generate WebMVC project //
     /////////////////////////////
-    string StartupProject = "WebAPI";
+    string StartupProject = "WebMVC";
     CreateWebCoreProject(StartupProject);
 #>
 <Project Sdk="Microsoft.NET.Sdk.Web">
@@ -27,7 +27,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -39,7 +38,7 @@
   </ItemGroup>
 
 </Project>
-<# OverwriteFile(StartupProject, "", "WebAPI.csproj"); #>
+<# OverwriteFile(StartupProject, "", "WebMVC.csproj"); #>
 <#  
     ////////////////////////////////////////////////////////
     // Get defined Entities details and DbContext details //
@@ -63,22 +62,6 @@
         efContext = classWithDbContext.Name;
     }
 #>
-//////////////////////////////////////////
-// generated AddBasicAuthExtension.cs //
-//////////////////////////////////////////
-using <#= StartupProject #>.Middlewares;
-
-namespace <#= StartupProject #>.Extensions
-{
-    public static class AddBasicAuthExtension
-    {
-        public static IApplicationBuilder UseBasicAuthMiddleware(this IApplicationBuilder builder)
-        {
-            return builder.UseMiddleware<BasicAuthMiddleware>();
-        }
-    }
-}
-<# CreateFile(StartupProject, "Extensions","AddBasicAuthExtension.cs"); #>
 //////////////////////////////////////////////
 // generated ExceptionHandlingMiddleware.cs //
 //////////////////////////////////////////////
@@ -128,67 +111,6 @@ namespace <#= StartupProject #>.Middlewares
     }
 }
 <# CreateFile(StartupProject, "Middlewares","ExceptionHandlingMiddleware.cs"); #>
-//////////////////////////////////////////////
-// generated BasicAuthMiddleware.cs //
-//////////////////////////////////////////////
-using Microsoft.Extensions.Options;
-using System.Text;
-using <#= StartupProject #>.AppSetting;
-
-namespace <#= StartupProject #>.Middlewares
-{
-    public class BasicAuthMiddleware
-    {
-        private readonly RequestDelegate _next;
-        private readonly BasicAuthentication _basicAuthentication;
-        public BasicAuthMiddleware(RequestDelegate next, IOptions<BasicAuthentication> basicAuthentication)
-        {
-            _next = next;
-            _basicAuthentication = basicAuthentication.Value;
-        }
-
-        public async Task Invoke(HttpContext httpContext)
-        {
-            string authHeader = httpContext.Request.Headers["Authorization"];
-            if (authHeader != null)
-            {
-                string auth = authHeader.Split(new char[] { ' ' })[1];
-                Encoding encoding = Encoding.GetEncoding("UTF-8");
-                var usernameAndPassword = encoding.GetString(Convert.FromBase64String(auth));
-                string username = usernameAndPassword.Split(new char[] { ':' })[0];
-                string password = usernameAndPassword.Split(new char[] { ':' })[1];
-                if (_basicAuthentication.User == username && _basicAuthentication.Password == password)
-                {
-                    await _next(httpContext);
-                }
-                else
-                {
-                    httpContext.Response.StatusCode = 401;
-                    return;
-                }
-            }
-            else
-            {
-                httpContext.Response.StatusCode = 401;
-                return;
-            }
-        }
-
-    }
-}
-<# CreateFile(StartupProject, "Middlewares","BasicAuthMiddleware.cs"); #>
-//////////////////////////////////////
-// generated BasicAuthentication.cs //
-//////////////////////////////////////
-namespace <#= StartupProject #>.AppSetting
-{
-    public class BasicAuthentication
-    {
-        public string User { get; set; }
-        public string Password { get; set; }
-    }
-}
-<# CreateFile(StartupProject, "AppSetting","BasicAuthentication.cs"); #>
 //////////////////////////
 // generated Program.cs //
 //////////////////////////
@@ -210,41 +132,8 @@ var configuration = new ConfigurationBuilder()
     //.AddEnvironmentVariables()
     .Build();
 
-// Add controllers
-builder.Services.AddControllers();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-
-    //the following is only needed for swagger to enable basic authenication
-    c.AddSecurityDefinition("basic", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "basic",
-        In = ParameterLocation.Header,
-        Description = "Basic Authorization header using the Bearer scheme."
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "basic"
-                            }
-                        },
-                        new string[] {}
-                    }
-                });
-
-});
+// Add services to the container.
+builder.Services.AddControllersWithViews();
 
 // added these for this project
 builder.Services.AddPersistence();
@@ -258,39 +147,24 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-//this is need for basic authentication
-builder.Services.Configure<BasicAuthentication>(configuration.GetSection("BasicAuthentication"));
-
 //this is need for exception handling
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
-{
-    app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
-        c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", "API v1");
-    });
-}
-
-//added to handle basic authentication     
-app.UseBasicAuthMiddleware();
-
 //added to handle exceptions
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
-//app.UseRouting();
+app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
 <# OverwriteFile(StartupProject, "","Program.cs"); #>
@@ -304,12 +178,6 @@ app.Run();
   "ConnectionStrings": {
     "SqliteDB": "DataSource=app.db;Cache=Shared",
     "SqlServerDB": "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"
-  },
-  
-  //required for basic authentication
-  "BasicAuthentication": {
-    "User": "SOMEuser",
-    "Password":"SOMEpassword"
   },
   
   //required to control serilog
@@ -347,6 +215,7 @@ app.Run();
     var properClassName = GetProperClassName(className);
     var controller =  properClassName + "Controller";
     (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    var propList = FindListOfProperitesOfClass(dte,project1,EntityNamespace+"."+properClassName);
 #>
 ////////////////////////////////////
 // generated <#= controller #>.cs //
@@ -358,11 +227,9 @@ using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace WebAPI
+namespace WebMVC
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class <#= properClassName #>Controller : ControllerBase
+    public class <#= properClassName #>Controller : Controller
     {
         private readonly ILogger<<#= properClassName #>Controller> logger;
         private readonly IServiceManager _serviceManager;
@@ -372,45 +239,75 @@ namespace WebAPI
             _serviceManager = serviceManager;
             this.logger = logger;
         }
-
-        // GET: api/<<#= properClassName #>Controller>
+        
+        // GET: <#= properClassName #>
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Index()
         {
             var result = await _serviceManager.<#= properClassName #>Service.GetAll<#= properClassName #>();
-            return Ok(result.entities);
+            return View(result.entities);
         }
 
-        // GET api/<<#= properClassName #>Controller>/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(<#= key1Type #>? id)
+        // GET <#= properClassName #>/Details/5
+        public async Task<IActionResult> Details(<#= key1Type #>? id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
-            return Ok(result.entity);
+            return View(result.entity);
         }
 
-        // POST api/<<#= properClassName #>Controller>
+        // GET <#= properClassName #>/Create>
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST <#= properClassName #>/Create>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] <#= properClassName #> entity)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("<#= propList #>")] <#= properClassName #> entity)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Add<#= properClassName #>(entity);
-            return Ok(result);
+            if (ModelState.IsValid)
+            {
+                var result = await _serviceManager.<#= properClassName #>Service.Add<#= properClassName #>(entity);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(entity);
         }
 
-        // PUT api/<<#= properClassName #>Controller>/5
-        [HttpPut()]
-        public async Task<IActionResult> Put([FromBody] <#= properClassName #> entity)
+        // Get <#= properClassName #>/Edit/5
+        public async Task<IActionResult> Edit(<#= key1Type #>? id)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(entity);
-            return Ok(result);
+            var result = await _serviceManager.<#= properClassName #>Service.UpdateWithId<#= properClassName #>(id);
+            return View(result);
         }
 
-        // DELETE api/<<#= properClassName #>Controller>/5
-        [HttpDelete("{id}")]
+        // POST <#= properClassName #>/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(<#= key1Type #> id, [Bind("<#= propList #>")] <#= properClassName #> entity)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _serviceManager.<#= properClassName #>Service.UpdateWithId<#= properClassName #>(id);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(entity);
+        }
+
+        // Get <#= properClassName #>/Delete/5
         public async Task<IActionResult> Delete(<#= key1Type #>? id)
         {
+            var result = await _serviceManager.<#= properClassName #>Service.UpdateWithId<#= properClassName #>(id);
+            return View(result);
+        }
+
+        // POST <<#= properClassName #>/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(<#= key1Type #> id)
+        {
             var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(id);
-            return Ok(result);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

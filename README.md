@@ -27,10 +27,7 @@ This will install two template files in your project.
 ![Imgur](https://i.imgur.com/8R9B6rS.png)  
 Once these template files are installed.   
 
-Run the all templates using "Transform All T4 Templates" from the build menu.  
-![Imgur](https://i.imgur.com/G6tc5vK.png)  
-or
-Run individual template by right click on the template and select "Run Custom Tool"
+I prefer to run Individual template by right click on the template and select "Run Custom Tool", instead of "Transform all T4 Templates" from Build menu.  
 ![Imgur](https://i.imgur.com/ZIdjSuG.png)  
 
 This will generate the following projects.  
@@ -143,8 +140,8 @@ This will create a ClassLibrary project named Clean_Architecture_Program_Generat
   
 ---
 ## How to check if this really works
-Once all the projects are generated using the T4Templates  
-By default Domain project will contains one entity named Sample.cs, it also generated Repository and Services for sample entity.  
+Once all the Data related projects are generated using the "◦Clean Architecture Database Access Generator.tt" template.    
+The Domain project by default will contains one entity named Sample.cs, it also generated Repository and Services for sample entity.  
 The classes highlighted in green will get generated for **each entity** defined in the Domain project entities folder.    
 The Classes highlighted in red gets re-generated every time with entity details.  
 ![Imgur](https://i.imgur.com/lxHyXsq.png)  
@@ -179,16 +176,15 @@ services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Nam
 ![Imgur](https://i.imgur.com/iMsZMGg.png)  
 
 Run this command with a connection string pointing to your Sql Server Database.  
-**scaffold-DbContext -Connection "Name=SqlServerDB" -Provider Microsoft.EntityFrameworkCore.SqlServer -Project Persistence -StartupProject WebAPI -OutputDir ..\Domain\Entities -Context ApplicationDbContext -ContextDir ..\Persistence\Context -Namespace Domain.Entities -ContextNamespace Persistence.Context -DataAnnotations -force**  
+**scaffold-DbContext -Connection "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;" -Provider Microsoft.EntityFrameworkCore.SqlServer -Project Persistence -StartupProject WebAPI -OutputDir ..\Domain\Entities -Context ApplicationDbContext -ContextDir ..\Persistence\Context -Namespace Domain.Entities -ContextNamespace Persistence.Context -DataAnnotations -force**  
 
 This will generate all entities in domain project  
 ![Imgur](https://i.imgur.com/RN1FCHt.png)  
 
-Run all templates  
-![Imgur](https://i.imgur.com/G6tc5vK.png)  
-
-or individual template  
-![Imgur](https://i.imgur.com/ZIdjSuG.png)  
+Run the templates:  
+Clean Architecture Database Access Generator.tt  
+and  
+Clean Architecture WebAPI Generator.tt  
 
 All repositories, services and controllers are generated for you.  
 ![Imgur](https://i.imgur.com/drJXm4q.png)  

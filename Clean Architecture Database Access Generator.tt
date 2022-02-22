@@ -228,8 +228,8 @@ namespace startup
                 {
                     //required if you are using entity framework
                     //now using Sqllite as database
-                    services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("DataSource=app.db"));
-                    //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"));
+                    //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("DataSource=app.db"));
+                    services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"));
                 })
                 .RunConsoleAsync();
         }
@@ -275,7 +275,6 @@ namespace Domain.Interfaces
         Task Add(T entity);
         void Remove(T entitiy);
         void Update(T entitiy);
-
     }
 }
 <# CreateFile("Domain", "Interfaces","IGenericRepository.cs"); #>
@@ -517,6 +516,7 @@ namespace Application.Interfaces
         Task<(IEnumerable<<#= properClassName #>> entities, string Message)> GetAll<#= properClassName #>(CancellationToken cancellationToken = default);
         Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
         Task<string> Remove<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
+        Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
         Task<string> Update<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default);
     }
 }
@@ -603,6 +603,21 @@ namespace Application.Services
                 _repositoryManager.<#= properClassName #>Repository.Remove(item);
                 await _repositoryManager.UnitOfWork.CompleteAsync(cancellationToken);
                 return "<#= properClassName #> record deleted";
+            }
+        }
+
+        public async Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default)
+        {
+            var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key1 #>);
+            if (item == null)
+            {
+                throw new EntityKeyNotFoundException("<#= properClassName #>", <#= key1 #>.ToString());
+            }
+            else
+            {
+                _repositoryManager.<#= properClassName #>Repository.Update(item);
+                await _repositoryManager.UnitOfWork.CompleteAsync(cancellationToken);
+                return "<#= properClassName #> record updated";
             }
         }
 
