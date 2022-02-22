@@ -179,7 +179,7 @@ services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Nam
 ![Imgur](https://i.imgur.com/iMsZMGg.png)  
 
 Run this command with a connection string pointing to your Sql Server Database.  
-**scaffold-DbContext -Connection "Name=SqlServerDb" -Provider Microsoft.EntityFrameworkCore.SqlServer -Project Persistence -StartupProject WebAPI -OutputDir ..\Domain\Entities -Context ApplicationDbContext -ContextDir ..\Persistence\Context -Namespace Domain.Entities -ContextNamespace Persistence.Context -DataAnnotations -force**  
+**scaffold-DbContext -Connection "Name=SqlServerDB" -Provider Microsoft.EntityFrameworkCore.SqlServer -Project Persistence -StartupProject WebAPI -OutputDir ..\Domain\Entities -Context ApplicationDbContext -ContextDir ..\Persistence\Context -Namespace Domain.Entities -ContextNamespace Persistence.Context -DataAnnotations -force**  
 
 This will generate all entities in domain project  
 ![Imgur](https://i.imgur.com/RN1FCHt.png)  
