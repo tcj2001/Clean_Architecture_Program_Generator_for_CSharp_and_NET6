@@ -76,6 +76,25 @@ namespace Domain.Entities
 
 </Project>
 <# OverwriteFile("Application", "","Application.csproj"); #>
+//////////////////////////////////////////
+// generated AddApplicationExtension.cs //
+//////////////////////////////////////////
+using Application.Interfaces;
+using Application.Services;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Application
+{
+    public static class AddApplicationExtension
+    {
+        public static IServiceCollection AddApplication(this IServiceCollection services)
+        {
+            services.AddScoped<IServiceManager, ServiceManager>();
+            return services;
+        }
+    }
+}
+<# CreateFile("Application", "","AddApplicationExtension.cs"); #>
 <#
     //////////////////////////////////
     // Generate Persistence project //
@@ -139,6 +158,29 @@ namespace Persistence.Context
     }
 }
 <# CreateFile("Persistence", "Context","ApplicationDbContext.cs"); #>
+//////////////////////////////////////////
+// generated AddPersistenceExtension.cs //
+//////////////////////////////////////////
+using Domain.Interfaces;
+using Persistence.Context;
+using Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Persistence
+{
+    public static class AddPersistenceExtension
+    {
+        public static IServiceCollection AddPersistence(this IServiceCollection services)
+        {
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=SqliteDB"));
+            //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDB"));
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
+            return services;
+        }
+    }
+}
+<# CreateFile("Persistence", "","AddPersistenceExtension.cs"); #>
 <#
     //////////////////////////////
     // Generate Startup project //
