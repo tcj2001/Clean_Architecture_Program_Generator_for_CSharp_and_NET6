@@ -114,12 +114,9 @@ namespace <#= StartupProject #>.Middlewares
 //////////////////////////
 // generated Program.cs //
 //////////////////////////
-using Microsoft.OpenApi.Models;
 using Serilog;
 using Application;
 using Persistence;
-using <#= StartupProject #>.AppSetting;
-using <#= StartupProject #>.Extensions;
 using <#= StartupProject #>.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);

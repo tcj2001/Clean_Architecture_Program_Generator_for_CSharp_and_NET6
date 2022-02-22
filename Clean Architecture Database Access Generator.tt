@@ -514,9 +514,9 @@ namespace Application.Interfaces
         Task<string> Add<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default);
         Task<(IEnumerable<<#= properClassName #>> entities, string Message)> Find<#= properClassName #>(Expression<Func<<#= properClassName #>, bool>> expression, CancellationToken cancellationToken = default);
         Task<(IEnumerable<<#= properClassName #>> entities, string Message)> GetAll<#= properClassName #>(CancellationToken cancellationToken = default);
-        Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
+        Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #>? <#= key1 #>, CancellationToken cancellationToken = default);
         Task<string> Remove<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
-        Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
+        Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #>? <#= key1 #>, CancellationToken cancellationToken = default);
         Task<string> Update<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default);
     }
 }
@@ -562,7 +562,7 @@ namespace Application.Services
             return (items, "<#= properClassName #> records retrieved");
         }
 
-        public async Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default)
+        public async Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #>? <#= key1 #>, CancellationToken cancellationToken = default)
         {
             var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key1 #>);
             if (item == null)
@@ -606,7 +606,7 @@ namespace Application.Services
             }
         }
 
-        public async Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default)
+        public async Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #>? <#= key1 #>, CancellationToken cancellationToken = default)
         {
             var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key1 #>);
             if (item == null)
