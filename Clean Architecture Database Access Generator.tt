@@ -268,8 +268,8 @@ namespace Domain.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {
-        ValueTask<T?> GetById(int id);
-        ValueTask<T?> GetById(string id);
+        ValueTask<T?> GetById(int? id);
+        ValueTask<T?> GetById(string? id);
         Task<IEnumerable<T>> GetAll();
         Task<IEnumerable<T>> Find(Expression<Func<T, bool>> expression);
         Task Add(T entity);
@@ -298,11 +298,11 @@ namespace Persistence.Repositories
             _context = context;
         }
 
-        public virtual async ValueTask<T?> GetById(int id)
+        public virtual async ValueTask<T?> GetById(int? id)
         {
             return await _context.Set<T>().FindAsync(id);
         }
-        public virtual async ValueTask<T?> GetById(string id)
+        public virtual async ValueTask<T?> GetById(string? id)
         {
             return await _context.Set<T>().FindAsync(id);
         }
@@ -421,7 +421,7 @@ namespace Domain.Exceptions
 {
     public sealed class EntityKeyFoundException : BadRequestException
     {
-        public EntityKeyFoundException(string entity, string id)
+        public EntityKeyFoundException(string entity, string? id)
             : base(String.Format("Entity {0} with the identifier {1} exist.", entity, id))
         {
         }
@@ -435,7 +435,7 @@ namespace Domain.Exceptions
 {
     public sealed class EntityKeyNotFoundException : NotFoundException
     {
-        public EntityKeyNotFoundException(string entity, string id)
+        public EntityKeyNotFoundException(string entity, string? id)
             : base(String.Format("Entity {0} with the identifier {1} was not found.", entity, id))
         {
         }
@@ -514,9 +514,9 @@ namespace Application.Interfaces
         Task<string> Add<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default);
         Task<(IEnumerable<<#= properClassName #>> entities, string Message)> Find<#= properClassName #>(Expression<Func<<#= properClassName #>, bool>> expression, CancellationToken cancellationToken = default);
         Task<(IEnumerable<<#= properClassName #>> entities, string Message)> GetAll<#= properClassName #>(CancellationToken cancellationToken = default);
-        Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #>? <#= key1 #>, CancellationToken cancellationToken = default);
+        Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
         Task<string> Remove<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
-        Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #>? <#= key1 #>, CancellationToken cancellationToken = default);
+        Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
         Task<string> Update<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default);
     }
 }
@@ -562,7 +562,7 @@ namespace Application.Services
             return (items, "<#= properClassName #> records retrieved");
         }
 
-        public async Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #>? <#= key1 #>, CancellationToken cancellationToken = default)
+        public async Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default)
         {
             var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key1 #>);
             if (item == null)
@@ -606,7 +606,7 @@ namespace Application.Services
             }
         }
 
-        public async Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #>? <#= key1 #>, CancellationToken cancellationToken = default)
+        public async Task<string> UpdateWithId<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default)
         {
             var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key1 #>);
             if (item == null)

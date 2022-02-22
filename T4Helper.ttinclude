@@ -177,11 +177,15 @@
         var class1 = FindClass(dte, project, className);
         var prop1 = FindPropertyByAttribute(class1,"Key");
         var key1="id";
-        var key1Type="int";
+        var key1Type="int?";
         if(prop1!=null) {
             key1=prop1.Name;
             CodeTypeRef codeTypeRef = prop1.Type;
-            key1Type=codeTypeRef.AsString;
+            var key1T = codeTypeRef.AsString;
+            if (key1T=="string")
+                key1Type=codeTypeRef.AsString;
+            else
+                key1Type=codeTypeRef.AsString+'?';
             return(key1, key1Type);
         }
         return(null,null);

@@ -383,7 +383,7 @@ namespace WebAPI
 
         // GET api/<<#= properClassName #>Controller>/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(<#= key1Type #>? id)
+        public async Task<IActionResult> Get(<#= key1Type #> id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
             return Ok(result.entity);
@@ -407,7 +407,7 @@ namespace WebAPI
 
         // DELETE api/<<#= properClassName #>Controller>/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(<#= key1Type #>? id)
+        public async Task<IActionResult> Delete(<#= key1Type #> id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(id);
             return Ok(result);

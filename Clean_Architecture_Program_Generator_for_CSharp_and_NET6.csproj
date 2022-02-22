@@ -103,6 +103,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Update="Clean Architecture Database Access Generator.tt">
+	    <LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
+	  </Content>
 	  <Content Update="Clean Architecture WebMVC Generator.tt">
 	    <LastGenOutput>Clean Architecture WebMVC Generator.txt</LastGenOutput>
 	    <Generator>TextTemplatingFileGenerator</Generator>

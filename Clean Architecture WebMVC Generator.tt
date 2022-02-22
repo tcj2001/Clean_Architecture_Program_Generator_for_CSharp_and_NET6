@@ -246,7 +246,7 @@ namespace WebMVC
         }
 
         // GET <#= properClassName #>/Details/5
-        public async Task<IActionResult> Details(<#= key1Type #>? id)
+        public async Task<IActionResult> Details(<#= key1Type #> id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
             return View(result.entity);
@@ -272,7 +272,7 @@ namespace WebMVC
         }
 
         // Get <#= properClassName #>/Edit/5
-        public async Task<IActionResult> Edit(<#= key1Type #>? id)
+        public async Task<IActionResult> Edit(<#= key1Type #> id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.UpdateWithId<#= properClassName #>(id);
             return View(result);
@@ -292,7 +292,7 @@ namespace WebMVC
         }
 
         // Get <#= properClassName #>/Delete/5
-        public async Task<IActionResult> Delete(<#= key1Type #>? id)
+        public async Task<IActionResult> Delete(<#= key1Type #> id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.UpdateWithId<#= properClassName #>(id);
             return View(result);
