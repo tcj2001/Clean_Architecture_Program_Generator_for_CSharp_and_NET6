@@ -9,7 +9,7 @@
 		<RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Authors>Thomson Mathews</Authors>
-		<Version>1.6.5</Version>
+		<Version>1.6.7</Version>
 		<PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<IncludeContentInPack>true</IncludeContentInPack>
@@ -26,9 +26,19 @@
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
 		</None>
+		<None Update="Clean Architecture Database Access Generator.txt">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Clean Architecture Database Access Generator.tt</DependentUpon>
+		</None>
 		<None Update="Clean Architecture WebAPI Generator.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
+		</None>
+		<None Update="Clean Architecture WebAPI Generator.txt">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Clean Architecture WebAPI Generator.tt</DependentUpon>
 		</None>
 		<None Update="T4Helper.ttinclude">
 		    <Generator>TextTemplatingFileGenerator</Generator>
@@ -79,6 +89,15 @@
 
 	<ItemGroup>
 	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="Clean Architecture Database Access Generator.tt">
+	    <Generator></Generator>
+	  </Content>
+	  <Content Update="Clean Architecture WebAPI Generator.tt">
+	    <Generator></Generator>
+	  </Content>
 	</ItemGroup>
 	
 </Project>

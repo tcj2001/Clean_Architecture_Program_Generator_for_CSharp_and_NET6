@@ -55,11 +55,14 @@ Define all entities in Entities folder, either using code first approach or data
 
 **Application Project**  
 Defines Interface for ServiceManager in the Interfaces folder, will also generate repository interface for each entity defined in the Domain project. ServiceManger is implemented in the Services Folder, it will also contain Services for each entities defined in the Domain project.  
-![Imgur](https://i.imgur.com/PZGqqWL.png)  
+![Imgur](https://i.imgur.com/qgTCBsT.png)  
 
 **Persistence Project:**     
 ApplicationDbContext should be defined or generated using Entity Framework in the context folder, Repositories folder contains GenericRepository, RepositoryManager and UnitOfWork implementation.  
-![Imgur](https://i.imgur.com/rG56cfd.png)  
+![Imgur](https://i.imgur.com/x6HoKdW.png)  
+Modify AddPersistenceExtension class to refer to correct connection string.  
+![Imgur](https://i.imgur.com/rRvAvrW.png)  
+
 
 **Startup Projects:**  
 This is a console application that will create a Generic Host which will help in dependency injection, here ApplicationDbContext is added to the ServiceCollection, this project will help you to run Entity framework commands to do entity migrations to a database or generate entities and ApplicationDbContext from existing database.  
@@ -76,15 +79,13 @@ This template will generate open a dialog box, select ASP.NET Core WebAPI projec
 
 **WebAPI Project:**  
 This contains controllers and other required classes.  
-![Imgur](https://i.imgur.com/f6AZMa9.png)  
+![Imgur](https://i.imgur.com/YcDbpv4.png)  
 
 **Controller Folder:**  
 Contains generated controller for each entities defined in Domain project.  
 
 **Extensions Folder:**  
-Contains extension for adding ServiceManager dependency, RepositoryManger dependency, AddplicationDBcontext dependency and Extension method to add BasicAuthMiddleware to the HTTP request pipeline.    
-Modify AddPersistenceExtension class in this folder to refer to correct connection string.  
-![Imgur](https://i.imgur.com/rRvAvrW.png)
+Contains extension method to add BasicAuthMiddleware to the HTTP request pipeline.    
 
 **MiddleWare Folder:**     
 Contains implementation for BasicAuthMiddleware and ExceptionHandlingMiddleware.  
@@ -93,7 +94,7 @@ Contains implementation for BasicAuthMiddleware and ExceptionHandlingMiddleware.
 Contains configuration for Serilog logging, connection string and basic authentication details.  
 
 **Appsetting Folder:**   
-Contains classes structure to read from appsettings.json file.    
+Contains classes structures to read from appsettings.json file.    
 
 **Program.cs**
 This connect all the wiring between the projects.
@@ -146,7 +147,7 @@ Once all the projects are generated using the T4Templates
 By default Domain project will contains one entity named Sample.cs, it also generated Repository and Services for sample entity.  
 The classes highlighted in green will get generated for **each entity** defined in the Domain project entities folder.    
 The Classes highlighted in red gets re-generated every time with entity details.  
-![Imgur](https://i.imgur.com/9AAuzNp.png)  
+![Imgur](https://i.imgur.com/lxHyXsq.png)  
 
 ## Code First approach 
 Since we already have a sample entity defined for you by the template, I will just make use of it.   
@@ -160,7 +161,7 @@ This will create App.db in WebAPI folder with a table named Sample.
 In the appsettings.json we already have two connections string pre-defined.  
 ![Imgur](https://i.imgur.com/7mh67uJ.png)  
 
-Make sure class AddPersistenceExtension in WebAPI project Extensions Folder has  
+Make sure class AddPersistenceExtension in Persistence project has  
 services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=SqliteDb"));
 ![Imgur](https://i.imgur.com/eab4hcV.png)  
 
@@ -173,20 +174,20 @@ Here we will make use of a BookStores database in my Sql Server setup.
 This database was grabbed from internet, credit goes to the person who made it available for community.
 ![Imgur](https://i.imgur.com/7mh67uJ.png)  
 
-Make sure class AddPersistenceExtension in WebAPI project Extensions Folder has   
+Make sure class AddPersistenceExtension in Persistence project has  
 services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDb"))
 ![Imgur](https://i.imgur.com/iMsZMGg.png)  
 
 Run this command with a connection string pointing to your Sql Server Database.  
-**scaffold-DbContext -Connection "Name=SqlServerDb" -Provider Microsoft.EntityFrameworkCore.SqlServer -Project Persistence -StartupProject WebAPI -OutputDir ..\Domain\Entities -Context ApplicationDbContext -ContextDir ..\Persistence\Context -Namespace Domain.Entities -ContextNamespace Persistence.Context -DataAnnotations -force**  
+**scaffold-DbContext -Connection "Name=SqlServerDB" -Provider Microsoft.EntityFrameworkCore.SqlServer -Project Persistence -StartupProject WebAPI -OutputDir ..\Domain\Entities -Context ApplicationDbContext -ContextDir ..\Persistence\Context -Namespace Domain.Entities -ContextNamespace Persistence.Context -DataAnnotations -force**  
 
 This will generate all entities in domain project  
 ![Imgur](https://i.imgur.com/RN1FCHt.png)  
 
-Run all templates 
+Run all templates  
 ![Imgur](https://i.imgur.com/G6tc5vK.png)  
 
-or individual template
+or individual template  
 ![Imgur](https://i.imgur.com/ZIdjSuG.png)  
 
 All repositories, services and controllers are generated for you.  

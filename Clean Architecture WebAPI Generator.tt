@@ -66,46 +66,6 @@
     }
 #>
 //////////////////////////////////////////
-// generated AddApplicationExtension.cs //
-//////////////////////////////////////////
-using Application.Interfaces;
-using Application.Services;
-
-namespace <#= StartupProject #>.Extensions
-{
-    public static class AddApplicationExtension
-    {
-        public static IServiceCollection AddApplication(this IServiceCollection services)
-        {
-            services.AddScoped<IServiceManager, ServiceManager>();
-            return services;
-        }
-    }
-}
-<# CreateFile(StartupProject, "Extensions","AddApplicationExtension.cs"); #>
-//////////////////////////////////////////
-// generated AddPersistenceExtension.cs //
-//////////////////////////////////////////
-using Domain.Interfaces;
-using Persistence.Context;
-using Persistence.Repositories;
-using Microsoft.EntityFrameworkCore;
-
-namespace <#= StartupProject #>.Extensions
-{
-    public static class AddPersistenceExtension
-    {
-        public static IServiceCollection AddPersistence(this IServiceCollection services)
-        {
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=SqliteDb"));
-            //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDb"));
-            services.AddScoped<IRepositoryManager, RepositoryManager>();
-            return services;
-        }
-    }
-}
-<# CreateFile(StartupProject, "Extensions","AddPersistenceExtension.cs"); #>
-//////////////////////////////////////////
 // generated AddBasicAuthExtension.cs //
 //////////////////////////////////////////
 using <#= StartupProject #>.Middlewares;
@@ -236,6 +196,8 @@ namespace <#= StartupProject #>.AppSetting
 //////////////////////////
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Application;
+using Persistence;
 using <#= StartupProject #>.AppSetting;
 using <#= StartupProject #>.Extensions;
 using <#= StartupProject #>.Middlewares;
