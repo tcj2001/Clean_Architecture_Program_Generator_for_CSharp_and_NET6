@@ -148,7 +148,6 @@ The Classes highlighted in red gets re-generated every time with entity details.
 
 ## Code First approach 
 Since we already have a sample entity defined for you by the template, I will just make use of it.   
-Just for simplicity let's create a SQLite database to hold a table for Sample entity in app.db by running these commands.  
 **dotnet ef migrations add "initialmigration2" --project Persistence --startup-project WebAPI**    
 **dotnet ef database update --project Persistence --startup-project WebAPI**  
 ![Imgur](https://i.imgur.com/UDldadJ.png)  
@@ -159,7 +158,7 @@ In the appsettings.json we already have two connections string pre-defined.
 ![Imgur](https://i.imgur.com/7mh67uJ.png)  
 
 Make sure class AddPersistenceExtension in Persistence project has  
-services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=SqliteDb"));
+services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDB"));
 ![Imgur](https://i.imgur.com/eab4hcV.png)  
 
 **Set WebAPI as a startup project and run it.**  
@@ -213,10 +212,9 @@ If possible do not use connection string directly in the above command.
 
 if you have an appsettings.json define connection strings as shown  
   "ConnectionStrings": {
-    "SqliteDB": "DataSource=app.db;Cache=Shared",
     "SqlServerDB": "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"
   }  
-then use "Name=SqliteDB" in the scaffold-DbContext -Connection parameter
+then use "Name=SqlServerDB" in the scaffold-DbContext -Connection parameter
 
 
 **Remove migration**  

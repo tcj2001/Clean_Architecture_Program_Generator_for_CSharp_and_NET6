@@ -17,8 +17,8 @@
 		<Description>This is a clean architecture project code generator which will generate repositories, services for each defined enitities along with unitofwork, it will also generate controllers for each entity in the WebAPI project</Description>
 		<PackageTags>Clean Architecture" Template WebAPI Web Repostory UnitOfWork Services Code Generator</PackageTags>
 
+		<TransformOnBuild>false</TransformOnBuild>
 		<PackageType>Template</PackageType>
-		<NoBuild>true</NoBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -105,6 +105,7 @@
 	<ItemGroup>
 	  <Content Update="Clean Architecture Database Access Generator.tt">
 	    <LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
+	    <Generator>TextTemplatingFileGenerator</Generator>
 	  </Content>
 	  <Content Update="Clean Architecture WebMVC Generator.tt">
 	    <LastGenOutput>Clean Architecture WebMVC Generator.txt</LastGenOutput>

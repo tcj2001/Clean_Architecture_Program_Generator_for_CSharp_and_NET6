@@ -11,6 +11,10 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Reflection" #>
+<# 
+    if (MessageWindow("Clean Architecture WebMVC Generator","Run this template")==false)
+        throw new Exception("Aborted"); 
+#>
 <#
     /////////////////////////////
     // Generate WebMVC project //
@@ -173,7 +177,6 @@ app.Run();
 {
   //define connection here
   "ConnectionStrings": {
-    "SqliteDB": "DataSource=app.db;Cache=Shared",
     "SqlServerDB": "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"
   },
   
@@ -210,7 +213,7 @@ app.Run();
 <#foreach(string className in classNames)
 {
     var properClassName = GetProperClassName(className);
-    var controller =  properClassName + "Controller";
+    var controller =  properClassName + "sController";
     (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
     var propList = FindListOfProperitesOfClass(dte,project1,EntityNamespace+"."+properClassName);
 #>
@@ -309,6 +312,235 @@ namespace WebMVC
     }
 }
 <# CreateFile(StartupProject, "Controllers", controller+".cs"); #>
+<#
+}
+#>
+<#foreach(string className in classNames)
+{
+    ////////////////////////////////////
+    // generate views                 //
+    ////////////////////////////////////
+    var properClassName = GetProperClassName(className);
+    var viewfolder =  "Views/"+properClassName;
+    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    var propList = ProperitesOfClass(dte,project1,EntityNamespace+"."+properClassName);
+#>
+//////////////////
+// Index.cshtml //
+//////////////////
+@model IEnumerable<Domain.Entities.<#= properClassName #>>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+<#
+foreach(string property in propList)
+{
+#>
+            <th>
+                @Html.DisplayNameFor(model => model.<#= property #>)
+            </th>
+<#
+}
+#>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+<#
+foreach(string property in propList)
+{
+#>
+            <th>
+                @Html.DisplayFor(modelItem => item.<#= property #>)
+            </th>
+<#
+}
+#>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.<#= key1 #>">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.<#= key1 #>">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.<#= key1 #>">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<# CreateFile(StartupProject, viewfolder, "Index.cshtml"); #>
+/////////////////
+// Edit.cshtml //
+/////////////////
+@model Domain.Entities.<#= properClassName #>>
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4><#= properClassName #>></h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="<#= key1 #>>" />
+<#
+foreach(string property in propList)
+{
+#>
+            <div class="form-group">
+                <label asp-for="<#= property #>" class="control-label"></label>
+                <input asp-for="<#= property #>" class="form-control" />
+                <span asp-validation-for="<#= property #>" class="text-danger"></span>
+            </div>
+<#
+}
+#>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<# CreateFile(StartupProject, viewfolder, "Edit.cshtml"); #>
+////////////////////
+// Details.cshtml //
+////////////////////
+@model Domain.Entities.<#= properClassName #>
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Author</h4>
+    <hr />
+    <dl class="row">
+<#
+foreach(string property in propList)
+{
+#>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.<#= property #>)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.<#= property #>)
+        </dd>
+<#
+}
+#>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.<#= key1 #>">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+<# CreateFile(StartupProject, viewfolder, "Details.cshtml"); #>
+///////////////////
+// Delete.cshtml //
+///////////////////
+@model Domain.Entities.<#= properClassName #>
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Author</h4>
+    <hr />
+    <dl class="row">
+<#
+foreach(string property in propList)
+{
+#>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.<#= property #>)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.<#= property #>)
+        </dd>
+<#
+}
+#>
+    </dl>
+   
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="<#= key1 #>" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>
+<# CreateFile(StartupProject, viewfolder, "Delete.cshtml"); #>
+///////////////////
+// Create.cshtml //
+///////////////////
+@model Domain.Entities.<#= properClassName #>
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4><#= properClassName #></h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<#
+foreach(string property in propList)
+{
+#>
+            <div class="form-group">
+                <label asp-for="<#= property #>" class="control-label"></label>
+                <input asp-for="<#= property #>" class="form-control" />
+                <span asp-validation-for="<#= property #>" class="text-danger"></span>
+            </div>
+<#
+}
+#>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<# CreateFile(StartupProject, viewfolder, "Create.cshtml"); #>
+
 <#
 }
 #>

@@ -11,6 +11,12 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Reflection" #>
+<# 
+    if (MessageWindow("Clean Architecture WebAPI Generator","Run this template")==false){
+        this.GenerationEnvironment.Remove(0, this.GenerationEnvironment.Length);
+        throw new Exception("Aborted");
+    }
+#>
 <#
     /////////////////////////////
     // Generate WebAPI project //
@@ -302,7 +308,6 @@ app.Run();
 {
   //define connection here
   "ConnectionStrings": {
-    "SqliteDB": "DataSource=app.db;Cache=Shared",
     "SqlServerDB": "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"
   },
   
@@ -345,7 +350,7 @@ app.Run();
 <#foreach(string className in classNames)
 {
     var properClassName = GetProperClassName(className);
-    var controller =  properClassName + "Controller";
+    var controller =  properClassName + "sController";
     (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
 #>
 ////////////////////////////////////

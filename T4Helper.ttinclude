@@ -1,5 +1,6 @@
 ﻿﻿<#@ template debug="false" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
+<#@ assembly name="System.Windows.Forms" #>
 <#@ assembly Name="EnvDTE" #>
 <#@ assembly Name="VsWebSite.Interop" #>
 <#@ Import Namespace="EnvDTE" #>
@@ -7,7 +8,19 @@
 <#@ import namespace="System.Globalization" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Linq" #>
-<#+
+<#@ import namespace="System.Windows" #>
+<#@ import namespace="System.Windows.Forms" #>
+<#+ 
+    public bool MessageWindow(string caption, string message)
+    {
+        MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+        var result = MessageBox.Show(message, caption, buttons);
+        if (result == System.Windows.Forms.DialogResult.Yes) 
+            return true;
+        else
+            return false;
+    }
+
     //Generating Seperate Files
     public void ProcessContent(bool flag, string project, string folder, string outputFileName, string content)
     {
@@ -163,13 +176,24 @@
     public static string FindListOfProperitesOfClass(DTE dte, Project project, string className)
     {
         var class1 = FindClass(dte, project, className);
-        string propList="";
+        string propList = null;
         foreach (var property in FindProperties(class1))
         {
             propList = propList + property.Name;
             propList = propList + ',';
         }
         return propList.TrimEnd(',');
+    }
+
+    public static List<string> ProperitesOfClass(DTE dte, Project project, string className)
+    {
+        var class1 = FindClass(dte, project, className);
+        List<string> props = new List<string>(); 
+        foreach (var property in FindProperties(class1))
+        {
+            props.Add(property.Name);
+        }
+        return props;
     }
 
     public static (string,string) GetKeyPropertyOfAClass(DTE dte, Project project, string className)
