@@ -11,6 +11,9 @@
 <#@ import namespace="System.Windows" #>
 <#@ import namespace="System.Windows.Forms" #>
 <#+ 
+    //uncomment the following line to force compile error so that templates using this include file won't run
+    #
+
     public bool MessageWindow(string caption, string message)
     {
         MessageBoxButtons buttons = MessageBoxButtons.YesNo;
@@ -153,7 +156,7 @@
     //Get properties of a class
     public static IEnumerable<CodeProperty> FindProperties(CodeType codeType)
     {
-        return codeType.Members.OfType<CodeProperty>().OrderBy(p => p.Name);
+        return codeType.Members.OfType<CodeProperty>();
     }
 
     //Get named properties of a class
@@ -163,14 +166,15 @@
     }
 
     //Get named properties of a class with given attribute 
-    public static CodeProperty FindPropertyByAttribute(CodeType codeType, string name)
+    public static List<CodeProperty> FindPropertyByAttribute(CodeType codeType, string name)
     {
+        List<CodeProperty> listOfKey = new List<CodeProperty>();
         foreach (var property in FindProperties(codeType))
         {
             var attr = property.Attributes.OfType<CodeAttribute>().FirstOrDefault(x => x.Name == name);
-            if(attr != null) return property;
+            if(attr != null) listOfKey.Add(property);
         }
-        return null;
+        return listOfKey;
     }
 
     public static string FindListOfProperitesOfClass(DTE dte, Project project, string className)
@@ -196,23 +200,67 @@
         return props;
     }
 
-    public static (string,string) GetKeyPropertyOfAClass(DTE dte, Project project, string className)
+    public static IDictionary<string,string> GetKeysOfAClass(DTE dte, Project project, string className)
     {
         var class1 = FindClass(dte, project, className);
-        var prop1 = FindPropertyByAttribute(class1,"Key");
-        var key1="id";
-        var key1Type="int?";
-        if(prop1!=null) {
-            key1=prop1.Name;
-            CodeTypeRef codeTypeRef = prop1.Type;
+        var keys = FindPropertyByAttribute(class1,"Key");
+        IDictionary<string, string> KeyAndType = new Dictionary<string, string>();
+        foreach(CodeProperty cp in keys)
+        {
+            var key1=cp.Name;
+            CodeTypeRef codeTypeRef = cp.Type;
             var key1T = codeTypeRef.AsString;
+            var key1Type ="";
             if (key1T=="string")
                 key1Type=codeTypeRef.AsString;
             else
                 key1Type=codeTypeRef.AsString+'?';
-            return(key1, key1Type);
+            KeyAndType.Add(key1,key1Type);
         }
-        return(null,null);
+        return KeyAndType;
+    }
+
+    public static (string, string, string, string, string, string) GetKeyAndTypeStrings(DTE dte, Project project, string className)
+    {
+        var keysAndTypes = GetKeysOfAClass(dte,project,className);
+
+        var keytype="";
+        foreach(var kt in keysAndTypes){
+            keytype+=kt.Value+' '+kt.Key+",";
+        }
+        keytype=keytype.TrimEnd(',');
+
+        var key="";
+        foreach(var kt in keysAndTypes){
+            key+=kt.Key+",";
+        }
+        key=key.TrimEnd(',');
+
+        var keyValue="";
+        foreach(var kt in keysAndTypes){
+            keyValue+=kt.Key + ".ToString() + '/'+";
+        }
+        keyValue=keyValue.Substring(0,keyValue.Length-6);
+
+        var checkKeyEqual = "";
+        foreach(var kt in keysAndTypes) { 
+            checkKeyEqual+= kt.Key + " == entity." + kt.Key + " && "; 
+        }
+        checkKeyEqual = checkKeyEqual.Substring(0,checkKeyEqual.Length-4);
+
+        var entityKeys = "";
+        foreach(var kt in keysAndTypes) { 
+            entityKeys+= "entity." + kt.Key + ", "; 
+        }
+        entityKeys = entityKeys.Substring(0,entityKeys.Length-2);
+
+        var entityValue = "";
+        foreach(var kt in keysAndTypes) { 
+            entityValue+= "entity." + kt.Key + ".ToString() +'/'+";
+        }
+        entityValue = entityValue.Substring(0,entityValue.Length-5);
+
+        return( keytype, key, keyValue, checkKeyEqual, entityKeys, entityValue);
     }
 
     //Get Class by full name 

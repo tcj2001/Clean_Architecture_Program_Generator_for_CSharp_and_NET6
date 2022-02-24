@@ -11,12 +11,6 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Reflection" #>
-<# 
-    if (MessageWindow("Clean Architecture WebAPI Generator","Run this template")==false){
-        this.GenerationEnvironment.Remove(0, this.GenerationEnvironment.Length);
-        throw new Exception("Aborted");
-    }
-#>
 <#
     /////////////////////////////
     // Generate WebAPI project //
@@ -351,7 +345,7 @@ app.Run();
 {
     var properClassName = GetProperClassName(className);
     var controller =  properClassName + "sController";
-    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 ////////////////////////////////////
 // generated <#= controller #>.cs //
@@ -367,12 +361,12 @@ namespace WebAPI
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class <#= properClassName #>Controller : ControllerBase
+    public class <#= properClassName #>sController : ControllerBase
     {
-        private readonly ILogger<<#= properClassName #>Controller> logger;
+        private readonly ILogger<<#= properClassName #>sController> logger;
         private readonly IServiceManager _serviceManager;
 
-        public <#= properClassName #>Controller(IServiceManager serviceManager, ILogger<<#= properClassName #>Controller> logger)
+        public <#= properClassName #>sController(IServiceManager serviceManager, ILogger<<#= properClassName #>sController> logger)
         {
             _serviceManager = serviceManager;
             this.logger = logger;
@@ -388,7 +382,7 @@ namespace WebAPI
 
         // GET api/<<#= properClassName #>Controller>/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(<#= key1Type #> id)
+        public async Task<IActionResult> Get(<#= keyType #> id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
             return Ok(result.entity);
@@ -404,15 +398,15 @@ namespace WebAPI
 
         // PUT api/<<#= properClassName #>Controller>/5
         [HttpPut()]
-        public async Task<IActionResult> Put([FromBody] <#= properClassName #> entity)
+        public async Task<IActionResult> Put(<#= keyType #> <#= key #>, [FromBody] <#= properClassName #> entity)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(entity);
+            var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(<#= key #>, entity);
             return Ok(result);
         }
 
         // DELETE api/<<#= properClassName #>Controller>/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(<#= key1Type #> id)
+        public async Task<IActionResult> Delete(<#= keyType #> id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(id);
             return Ok(result);

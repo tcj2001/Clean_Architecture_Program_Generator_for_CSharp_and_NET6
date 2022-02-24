@@ -9,7 +9,7 @@
 		<RepositoryUrl>https://github.com/tcj2001/Clean_Architecture_Program_Generator_for_CSharp_and_NET6</RepositoryUrl>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Authors>Thomson Mathews</Authors>
-		<Version>1.7.0</Version>
+		<Version>1.7.2</Version>
 		<PackageId>Clean_Architecture_Program_Generator_for_CSharp_and_NET6_Solution</PackageId>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<IncludeContentInPack>true</IncludeContentInPack>
@@ -106,6 +106,9 @@
 	  <Content Update="Clean Architecture Database Access Generator.tt">
 	    <LastGenOutput>Clean Architecture Database Access Generator.txt</LastGenOutput>
 	    <Generator>TextTemplatingFileGenerator</Generator>
+	  </Content>
+	  <Content Update="Clean Architecture WebAPI Generator.tt">
+	    <LastGenOutput>Clean Architecture WebAPI Generator.txt</LastGenOutput>
 	  </Content>
 	  <Content Update="Clean Architecture WebMVC Generator.tt">
 	    <LastGenOutput>Clean Architecture WebMVC Generator.txt</LastGenOutput>

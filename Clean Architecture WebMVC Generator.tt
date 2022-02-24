@@ -11,10 +11,6 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Reflection" #>
-<# 
-    if (MessageWindow("Clean Architecture WebMVC Generator","Run this template")==false)
-        throw new Exception("Aborted"); 
-#>
 <#
     /////////////////////////////
     // Generate WebMVC project //
@@ -214,7 +210,7 @@ app.Run();
 {
     var properClassName = GetProperClassName(className);
     var controller =  properClassName + "sController";
-    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
     var propList = FindListOfProperitesOfClass(dte,project1,EntityNamespace+"."+properClassName);
 #>
 ////////////////////////////////////
@@ -229,12 +225,12 @@ using Microsoft.Extensions.Logging;
 
 namespace WebMVC
 {
-    public class <#= properClassName #>Controller : Controller
+    public class <#= properClassName #>sController : Controller
     {
-        private readonly ILogger<<#= properClassName #>Controller> logger;
+        private readonly ILogger<<#= properClassName #>sController> logger;
         private readonly IServiceManager _serviceManager;
 
-        public <#= properClassName #>Controller(IServiceManager serviceManager, ILogger<<#= properClassName #>Controller> logger)
+        public <#= properClassName #>sController(IServiceManager serviceManager, ILogger<<#= properClassName #>sController> logger)
         {
             _serviceManager = serviceManager;
             this.logger = logger;
@@ -249,7 +245,7 @@ namespace WebMVC
         }
 
         // GET <#= properClassName #>/Details/5
-        public async Task<IActionResult> Details(<#= key1Type #> id)
+        public async Task<IActionResult> Details(<#= keyType #> id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
             return View(result.entity);
@@ -275,36 +271,36 @@ namespace WebMVC
         }
 
         // Get <#= properClassName #>/Edit/5
-        public async Task<IActionResult> Edit(<#= key1Type #> id)
+        public async Task<IActionResult> Edit(<#= keyType #> id)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.UpdateWithId<#= properClassName #>(id);
-            return View(result);
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
+            return View(result.entity);
         }
 
         // POST <#= properClassName #>/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(<#= key1Type #> id, [Bind("<#= propList #>")] <#= properClassName #> entity)
+        public async Task<IActionResult> Edit(<#= keyType #> id, [Bind("<#= propList #>")] <#= properClassName #> entity)
         {
             if (ModelState.IsValid)
             {
-                var result = await _serviceManager.<#= properClassName #>Service.UpdateWithId<#= properClassName #>(id);
+                var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(id,entity);
                 return RedirectToAction(nameof(Index));
             }
             return View(entity);
         }
 
         // Get <#= properClassName #>/Delete/5
-        public async Task<IActionResult> Delete(<#= key1Type #> id)
+        public async Task<IActionResult> Delete(<#= keyType #> id)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.UpdateWithId<#= properClassName #>(id);
-            return View(result);
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
+            return View(result.entity);
         }
 
         // POST <<#= properClassName #>/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(<#= key1Type #> id)
+        public async Task<IActionResult> DeleteConfirmed(<#= keyType #> id)
         {
             var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(id);
             return RedirectToAction(nameof(Index));
@@ -315,19 +311,22 @@ namespace WebMVC
 <#
 }
 #>
-<#foreach(string className in classNames)
+<#
+////////////////////////////////////
+// generate views loop            //
+////////////////////////////////////
+foreach(string className in classNames)
 {
-    ////////////////////////////////////
-    // generate views                 //
-    ////////////////////////////////////
     var properClassName = GetProperClassName(className);
-    var viewfolder =  "Views/"+properClassName;
-    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    var viewfolder =  "Views/"+properClassName+'s';
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
     var propList = ProperitesOfClass(dte,project1,EntityNamespace+"."+properClassName);
 #>
+<#
 //////////////////
 // Index.cshtml //
 //////////////////
+#>
 @model IEnumerable<Domain.Entities.<#= properClassName #>>
 
 @{
@@ -369,19 +368,21 @@ foreach(string property in propList)
 }
 #>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.<#= key1 #>">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.<#= key1 #>">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.<#= key1 #>">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.<#= key #>">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.<#= key #>">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.<#= key #>">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
 <# CreateFile(StartupProject, viewfolder, "Index.cshtml"); #>
+<#
 /////////////////
 // Edit.cshtml //
 /////////////////
-@model Domain.Entities.<#= properClassName #>>
+#>
+@model Domain.Entities.<#= properClassName #>
 
 @{
     ViewData["Title"] = "Edit";
@@ -389,13 +390,13 @@ foreach(string property in propList)
 
 <h1>Edit</h1>
 
-<h4><#= properClassName #>></h4>
+<h4><#= properClassName #></h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="<#= key1 #>>" />
+            <input type="hidden" asp-for="<#= key #>" />
 <#
 foreach(string property in propList)
 {
@@ -423,9 +424,11 @@ foreach(string property in propList)
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
 <# CreateFile(StartupProject, viewfolder, "Edit.cshtml"); #>
+<#
 ////////////////////
 // Details.cshtml //
 ////////////////////
+#>
 @model Domain.Entities.<#= properClassName #>
 
 @{
@@ -435,7 +438,7 @@ foreach(string property in propList)
 <h1>Details</h1>
 
 <div>
-    <h4>Author</h4>
+    <h4><#= properClassName #></h4>
     <hr />
     <dl class="row">
 <#
@@ -454,13 +457,15 @@ foreach(string property in propList)
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.<#= key1 #>">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.<#= key #>">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
 <# CreateFile(StartupProject, viewfolder, "Details.cshtml"); #>
+<#
 ///////////////////
 // Delete.cshtml //
 ///////////////////
+#>
 @model Domain.Entities.<#= properClassName #>
 
 @{
@@ -471,7 +476,7 @@ foreach(string property in propList)
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>Author</h4>
+    <h4><#= properClassName #></h4>
     <hr />
     <dl class="row">
 <#
@@ -490,15 +495,17 @@ foreach(string property in propList)
     </dl>
    
     <form asp-action="Delete">
-        <input type="hidden" asp-for="<#= key1 #>" />
+        <input type="hidden" asp-for="<#= key #>" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>
 <# CreateFile(StartupProject, viewfolder, "Delete.cshtml"); #>
+<#
 ///////////////////
 // Create.cshtml //
 ///////////////////
+#>
 @model Domain.Entities.<#= properClassName #>
 
 @{
@@ -543,4 +550,73 @@ foreach(string property in propList)
 
 <#
 }
+////////////////////////////////////
+// end loop of generate views     //
+////////////////////////////////////
 #>
+<#
+////////////////////
+// _Layout.cshtml //
+////////////////////
+#>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WebMVC</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebMVC.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebMVC</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+<#
+foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="<#= properClassName #>s" asp-action="Index"><#= properClassName #>s</a>
+                        </li>
+<#
+}
+#>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2022 - WebMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+<# OverwriteFile(StartupProject, "Views/Shared", "_Layout.cshtml"); #>
