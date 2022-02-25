@@ -56,7 +56,7 @@ Define all entities in Entities folder, either using code first approach or data
 ![Imgur](https://i.imgur.com/CASrxLn.png)
 
 **Application Project**  
-Defines Interface for ServiceManager, Services in the ServiceInterfaces folder, implementation of ServiceManager and Services in Services folder, interfaces for RepositoryManager, GenericRepository, Repositories and UnitOfWork in RepositoryInterface folder. 
+Defines Interface for ServiceManager, Services in the ServiceInterfaces folder, implementation of ServiceManager and Services in Services folder, interfaces for RepositoryManager, GenericRepository, Repositories and UnitOfWork in RepositoryInterface folder.  
 ![Imgur](https://i.imgur.com/yNEeYTf.png)
 
 **Persistence Project:**     
