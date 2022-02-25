@@ -210,7 +210,8 @@ app.Run();
 {
     var properClassName = GetProperClassName(className);
     var controller =  properClassName + "sController";
-    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors) 
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
     var propList = FindListOfProperitesOfClass(dte,project1,EntityNamespace+"."+properClassName);
 #>
 ////////////////////////////////////
@@ -245,9 +246,9 @@ namespace WebMVC
         }
 
         // GET <#= properClassName #>/Details/5
-        public async Task<IActionResult> Details(<#= keyType #> id)
+        public async Task<IActionResult> Details(<#= keyType #>)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(<#= key #>);
             return View(result.entity);
         }
 
@@ -271,38 +272,38 @@ namespace WebMVC
         }
 
         // Get <#= properClassName #>/Edit/5
-        public async Task<IActionResult> Edit(<#= keyType #> id)
+        public async Task<IActionResult> Edit(<#= keyType #>)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(<#= key #>);
             return View(result.entity);
         }
 
         // POST <#= properClassName #>/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(<#= keyType #> id, [Bind("<#= propList #>")] <#= properClassName #> entity)
+        public async Task<IActionResult> Edit(<#= keyType #>, [Bind("<#= propList #>")] <#= properClassName #> entity)
         {
             if (ModelState.IsValid)
             {
-                var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(id,entity);
+                var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(<#= key #>,entity);
                 return RedirectToAction(nameof(Index));
             }
             return View(entity);
         }
 
         // Get <#= properClassName #>/Delete/5
-        public async Task<IActionResult> Delete(<#= keyType #> id)
+        public async Task<IActionResult> Delete(<#= keyType #>)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(<#= key #>);
             return View(result.entity);
         }
 
         // POST <<#= properClassName #>/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(<#= keyType #> id)
+        public async Task<IActionResult> DeleteConfirmed(<#= keyType #>)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(id);
+            var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(<#= key #>);
             return RedirectToAction(nameof(Index));
         }
     }
@@ -319,7 +320,8 @@ foreach(string className in classNames)
 {
     var properClassName = GetProperClassName(className);
     var viewfolder =  "Views/"+properClassName+'s';
-    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors)
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
     var propList = ProperitesOfClass(dte,project1,EntityNamespace+"."+properClassName);
 #>
 <#
@@ -368,9 +370,9 @@ foreach(string property in propList)
 }
 #>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.<#= key #>">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.<#= key #>">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.<#= key #>">Delete</a>
+                <a asp-action="Edit" <#= asprouteItem #>>Edit</a> |
+                <a asp-action="Details" <#= asprouteItem #>>Details</a> |
+                <a asp-action="Delete" <#= asprouteItem #>>Delete</a>
             </td>
         </tr>
 }
@@ -396,16 +398,33 @@ foreach(string property in propList)
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="<#= key #>" />
+            <#= aspfors #>
 <#
 foreach(string property in propList)
 {
 #>
+            <#
+            if(key.Contains(property))
+            {
+            #>
+            <div class="form-group">
+                <label asp-for="<#= property #>" class="control-label"></label>
+                <input asp-for="<#= property #>" disabled="disabled" class="form-control" />
+                <span asp-validation-for="<#= property #>" class="text-danger"></span>
+            </div>
+            <#
+            }
+            else
+            {
+            #>
             <div class="form-group">
                 <label asp-for="<#= property #>" class="control-label"></label>
                 <input asp-for="<#= property #>" class="form-control" />
                 <span asp-validation-for="<#= property #>" class="text-danger"></span>
             </div>
+            <#
+            }
+            #>
 <#
 }
 #>
@@ -457,7 +476,7 @@ foreach(string property in propList)
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.<#= key #>">Edit</a> |
+    <a asp-action="Edit"  <#= asprouteModel #>>Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
 <# CreateFile(StartupProject, viewfolder, "Details.cshtml"); #>
@@ -495,7 +514,7 @@ foreach(string property in propList)
     </dl>
    
     <form asp-action="Delete">
-        <input type="hidden" asp-for="<#= key #>" />
+        <#= aspfors #>
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>

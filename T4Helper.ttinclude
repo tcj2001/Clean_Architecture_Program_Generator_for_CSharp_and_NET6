@@ -12,7 +12,7 @@
 <#@ import namespace="System.Windows.Forms" #>
 <#+ 
     //uncomment the following line to force compile error so that templates using this include file won't run
-    #
+    //#
 
     public bool MessageWindow(string caption, string message)
     {
@@ -220,7 +220,7 @@
         return KeyAndType;
     }
 
-    public static (string, string, string, string, string, string) GetKeyAndTypeStrings(DTE dte, Project project, string className)
+    public static (string, string, string, string, string, string, string, string, string, string) GetKeyAndTypeStrings(DTE dte, Project project, string className)
     {
         var keysAndTypes = GetKeysOfAClass(dte,project,className);
 
@@ -260,7 +260,31 @@
         }
         entityValue = entityValue.Substring(0,entityValue.Length-5);
 
-        return( keytype, key, keyValue, checkKeyEqual, entityKeys, entityValue);
+        var httpKeys = "";
+        foreach(var kt in keysAndTypes) { 
+            httpKeys+= "{" + kt.Key + "},";
+        }
+        httpKeys = httpKeys.Substring(0,httpKeys.Length-1);
+
+        var asprouteItem = "";
+        foreach(var kt in keysAndTypes) { 
+            asprouteItem+= "asp-route-" + kt.Key + "=\"@item." + kt.Key + "\" ";
+        }
+        asprouteItem = asprouteItem.Substring(0,asprouteItem.Length-1);
+
+        var asprouteModel = "";
+        foreach(var kt in keysAndTypes) { 
+            asprouteModel+= "asp-route-" + kt.Key + "=\"@Model?." + kt.Key + "\" ";
+        }
+        asprouteModel = asprouteModel.Substring(0,asprouteModel.Length-1);
+
+        var aspfors = "";
+        foreach(var kt in keysAndTypes) { 
+            aspfors+= "<input type=\"hidden\" asp-for=\"" + kt.Key + "\" /> ";
+        }
+        aspfors = aspfors.Substring(0,aspfors.Length-1);
+
+        return( keytype, key, keyValue, checkKeyEqual, entityKeys, entityValue, httpKeys, asprouteItem, asprouteModel, aspfors);
     }
 
     //Get Class by full name 

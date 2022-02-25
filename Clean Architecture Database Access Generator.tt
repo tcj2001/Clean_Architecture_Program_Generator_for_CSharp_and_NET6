@@ -142,12 +142,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Context
 {
-    public class ApplicationDbContext : DbContext
+    public partial class ApplicationDbContext : DbContext
     {
+        public ApplicationDbContext()
+        {
+        }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
         }
+
+        public virtual DbSet<Sample> Samples { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -157,7 +163,18 @@ namespace Persistence.Context
             }
         }
 
-        public DbSet<Sample> Samples { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+        
+            modelBuilder.Entity<Sample>(entity =>
+            {
+                entity.HasKey(e => new { e.Id1, e.Id2, e.Id3 });
+            });
+            
+            OnModelCreatingPartial(modelBuilder);
+        }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
 <# CreateFile("Persistence", "Context","ApplicationDbContext.cs"); #>
@@ -478,7 +495,8 @@ namespace Domain.Exceptions
 {
     var properClassName = GetProperClassName(className);
     var repositoryName =  properClassName + "Repository";
-    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors) 
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 /////////////////////////////////////////
 // generated I<#= repositoryName #>.cs //
@@ -500,7 +518,8 @@ namespace Domain.Interfaces
 {
     var properClassName = GetProperClassName(className);
     var repositoryName =  properClassName + "Repository";
-    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors)
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 ////////////////////////////////////////
 // generated <#= repositoryName #>.cs //
@@ -531,7 +550,8 @@ namespace Persistence.Repositories
 {
     var properClassName = GetProperClassName(className);
     var serviceName =  properClassName + "Service";
-    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors)
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 //////////////////////////////////////
 // generated I<#= serviceName #>.cs //
@@ -560,7 +580,8 @@ namespace Application.Interfaces
     var properClassName = GetProperClassName(className);
     var serviceName =  properClassName + "Service";
     var repositoryName =  properClassName + "Repository";
-    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors) 
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 /////////////////////////////////////
 // generated <#= serviceName #>.cs //

@@ -345,7 +345,8 @@ app.Run();
 {
     var properClassName = GetProperClassName(className);
     var controller =  properClassName + "sController";
-    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue) = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors) 
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 ////////////////////////////////////
 // generated <#= controller #>.cs //
@@ -381,10 +382,10 @@ namespace WebAPI
         }
 
         // GET api/<<#= properClassName #>Controller>/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(<#= keyType #> id)
+        [HttpGet("<#= httpKeys #>")]
+        public async Task<IActionResult> Get(<#= keyType #>)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(<#= key #>);
             return Ok(result.entity);
         }
 
@@ -398,17 +399,17 @@ namespace WebAPI
 
         // PUT api/<<#= properClassName #>Controller>/5
         [HttpPut()]
-        public async Task<IActionResult> Put(<#= keyType #> <#= key #>, [FromBody] <#= properClassName #> entity)
+        public async Task<IActionResult> Put(<#= keyType #>, [FromBody] <#= properClassName #> entity)
         {
             var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(<#= key #>, entity);
             return Ok(result);
         }
 
         // DELETE api/<<#= properClassName #>Controller>/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(<#= keyType #> id)
+        [HttpDelete("<#= httpKeys #>")]
+        public async Task<IActionResult> Delete(<#= keyType #>)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(id);
+            var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(<#= key #>);
             return Ok(result);
         }
     }
