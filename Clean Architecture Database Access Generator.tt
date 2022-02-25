@@ -83,7 +83,7 @@ namespace Domain.Entities
 //////////////////////////////////////////
 // generated AddApplicationExtension.cs //
 //////////////////////////////////////////
-using Application.Interfaces;
+using Application.ServiceInterfaces;
 using Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -159,7 +159,7 @@ namespace Persistence.Context
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Name=SqlServerDB");
             }
         }
 
@@ -181,7 +181,7 @@ namespace Persistence.Context
 //////////////////////////////////////////
 // generated AddPersistenceExtension.cs //
 //////////////////////////////////////////
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
 using Persistence.Context;
 using Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -279,7 +279,7 @@ namespace startup
     ////////////////////////////////////////////////////////
     string EntityNamespace = "Domain.Entities";
     string DbContextNamespace = "Persistence.Context";
-    string efContext = "ApplicationDbContext"; //If Context is not in the same namespace rename this to the name of the context
+    string efContext = "ApplicationDbContext";
 
     IServiceProvider serviceProvider = (IServiceProvider)this.Host;
     DTE dte = serviceProvider.GetService(typeof(DTE)) as DTE; 
@@ -301,7 +301,7 @@ namespace startup
 /////////////////////////////////////
 using System.Linq.Expressions;
 
-namespace Domain.Interfaces
+namespace Application.RepositoryInterfaces
 {
     public interface IGenericRepository<T> where T : class
     {
@@ -312,11 +312,11 @@ namespace Domain.Interfaces
         void Update(T entitiy);
     }
 }
-<# CreateFile("Domain", "Interfaces","IGenericRepository.cs"); #>
+<# CreateFile("Application", "RepositoryInterfaces","IGenericRepository.cs"); #>
 ////////////////////////////////////
 // generated GenericRepository.cs //
 ////////////////////////////////////
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
 using Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -361,7 +361,7 @@ namespace Persistence.Repositories
 // generated IUnitOfWork.cs //
 //////////////////////////////
 using Microsoft.EntityFrameworkCore;
-namespace Domain.Interfaces
+namespace Application.RepositoryInterfaces
 {
     public interface IUnitOfWork
     {
@@ -371,13 +371,13 @@ namespace Domain.Interfaces
         Task<int> CompleteAsync(CancellationToken cancellationToken = default);
     }
 }
-<# CreateFile("Domain", "Interfaces","IUnitOfWork.cs"); #>
+<# CreateFile("Application", "RepositoryInterfaces","IUnitOfWork.cs"); #>
 /////////////////////////////
 // generated UnitOfWork.cs //
 /////////////////////////////
-using Microsoft.EntityFrameworkCore;
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
 using Persistence.Context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 
@@ -503,14 +503,14 @@ namespace Domain.Exceptions
 /////////////////////////////////////////
 using Domain.Entities;
 
-namespace Domain.Interfaces
+namespace Application.RepositoryInterfaces
 {
     public interface I<#= repositoryName #> : IGenericRepository<<#= properClassName #>>
     {
         ValueTask<<#= properClassName #>?> GetById(<#= keyType #>);
     }
 }
-<# CreateFile("Domain", "Interfaces", "I"+repositoryName+".cs"); #>
+<# CreateFile("Application", "RepositoryInterfaces", "I"+repositoryName+".cs"); #>
 <#
 }
 #>
@@ -524,8 +524,8 @@ namespace Domain.Interfaces
 ////////////////////////////////////////
 // generated <#= repositoryName #>.cs //
 ////////////////////////////////////////
+using Application.RepositoryInterfaces;
 using Domain.Entities;
-using Domain.Interfaces;
 using Persistence.Context;
 
 namespace Persistence.Repositories
@@ -559,7 +559,7 @@ namespace Persistence.Repositories
 using Domain.Entities;
 using System.Linq.Expressions;
 
-namespace Application.Interfaces
+namespace Application.ServiceInterfaces
 {
     public interface I<#= properClassName #>Service
     {
@@ -571,7 +571,7 @@ namespace Application.Interfaces
         Task<string> Update<#= properClassName #>(<#= keyType #>, <#= properClassName #> entity, CancellationToken cancellationToken = default);
     }
 }
-<# CreateFile("Application", "Interfaces", "I"+serviceName+".cs"); #>
+<# CreateFile("Application", "ServiceInterfaces", "I"+serviceName+".cs"); #>
 <#
 }
 #>
@@ -586,10 +586,10 @@ namespace Application.Interfaces
 /////////////////////////////////////
 // generated <#= serviceName #>.cs //
 /////////////////////////////////////
-using Application.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions;
-using Domain.Interfaces;
+using Application.ServiceInterfaces;
+using Application.RepositoryInterfaces;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
@@ -695,7 +695,7 @@ namespace Application.Services
 //////////////////////////////////
 // generated IServiceManager.cs //
 //////////////////////////////////
-namespace Application.Interfaces
+namespace Application.ServiceInterfaces
 {
     public interface IServiceManager
     {
@@ -709,12 +709,12 @@ namespace Application.Interfaces
 #>
     }
 }
-<# OverwriteFile("Application", "Interfaces","IServiceManager.cs"); #>
+<# OverwriteFile("Application", "ServiceInterfaces","IServiceManager.cs"); #>
 /////////////////////////////////
 // generated ServiceManager.cs //
 /////////////////////////////////
-using Application.Interfaces;
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
+using Application.ServiceInterfaces;
 
 namespace Application.Services
 {
@@ -753,7 +753,7 @@ namespace Application.Services
 /////////////////////////////////////
 // generated IRepositoryManager.cs //
 /////////////////////////////////////
-namespace Domain.Interfaces
+namespace Application.RepositoryInterfaces
 {
     public interface IRepositoryManager
     {
@@ -768,11 +768,11 @@ namespace Domain.Interfaces
         IUnitOfWork UnitOfWork { get; }
     }
 }
-<# OverwriteFile("Domain", "Interfaces","IRepositoryManager.cs"); #>
+<# OverwriteFile("Application", "RepositoryInterfaces","IRepositoryManager.cs"); #>
 ////////////////////////////////////
 // generated RepositoryManager.cs //
 ////////////////////////////////////
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
 using Persistence.Context;
 
 namespace Persistence.Repositories

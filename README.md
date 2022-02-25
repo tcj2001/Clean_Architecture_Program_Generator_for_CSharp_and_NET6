@@ -1,5 +1,6 @@
-﻿# Clean Architecture Program Generator  
-Program Generator to **generate** Clean Architecture based project structure for Visual studio Solution containing Repositories, Services and Controllers.  
+﻿# Clean Architecture Style Code Generator  
+This is a .Net Core Clean Architecture style code generator which will generate Domain project containing entities; Application project containing repository interfaces, service interfaces, service implementations; Persistence project containg ApplicationDbcontext, repository implementations; it will also generate controllers for each entity in the WebAPI or WEBMVC project.  
+
 
 ---
 ## Table of Contents
@@ -21,40 +22,46 @@ This will install two template files in your project.
 [Clean Architecture Database Access Generator.tt](#clean-architecture-database-access-generator.tt)  
 [Clean Architecture WebAPI Generator.tt](#clean-architecture-webapi-generator.tt)  
 [Clean Architecture WebMVC Generator.tt](#clean-architecture-webmvc-generator.tt)  
-![Imgur](https://i.imgur.com/sBLfNRD.png)  
+![Imgur](https://i.imgur.com/tSuZX6y.png)
 
 Once these template files are installed.   
 
-Run **Clean Architecture Database Access Generator.tt** template by right click on the template and select "Run Custom Tool".  
-![Imgur](https://i.imgur.com/ZIdjSuG.png)  
+Run **Clean Architecture Database Access Generator.tt** template by right clicking on the template and select "Run Custom Tool".  
+![Imgur](https://i.imgur.com/MpsMt8f.png) 
 
 This will generate the following projects.  
-![Imgur](https://i.imgur.com/mbJYKGZ.png)  
-Now define entities in the Domain Project using code first approach or database first approach 
-![Imgur](https://i.imgur.com/eW5s1uW.png)  
-and run the transformation again.  
+![Imgur](https://i.imgur.com/qsjnhqG.png)
+Now define entities in the Domain Project entities folder using code first approach or database first approach and ApplicationDbContext in Persistence project context folder.  
+![Imgur](https://i.imgur.com/G1zoCm5.png)
+**Run Clean Architecture Database Access Generator.tt again** to generate all repositories, services for the each entity.  
 
-**Voila! all repositories, services and controller are generated for you by the templates.**  
+**Run Clean Architecture WebAPI Generator.tt** to generate API controllers in WebAPI project.   
 
-Now just set WebAPI as a startup project and run it, that's it.  
+**Run Clean Architecture WebMVC Generator.tt** to generate MVC controllers in WebMVC project.   
+
+set WebAPI or WebMVC as a startup project.    
+
+**Voila! a working WebAPI or WebMVC is ready for you**.  
+
+if more entities are added, just run all these three transformation again, that's it.
 
 ---
 ## Clean Architecture Database Access Generator.tt
 This template will generate 4 projects:  
 Domain, Application, Persistence, Startup.  
-![Imgur](https://i.imgur.com/IqyphaF.png)  
+![Imgur](https://i.imgur.com/qsjnhqG.png) 
 
 **Domain Project:**  
-Define all entities in Entities folder, either using code first approach or database approach, Exceptions folder defines some basic useful exceptions that can be used in global error handling, Interface folder contains GenreicRepository, RepositoryManager and UnitOfWork interfaces that is implemented in the Persistence project.  
-![Imgur](https://i.imgur.com/i7ZTVsl.png)  
+Define all entities in Entities folder, either using code first approach or database approach, Exceptions folder defines some basic useful exceptions that can be used in global error handling.  
+![Imgur](https://i.imgur.com/CASrxLn.png)
 
 **Application Project**  
-Defines Interface for ServiceManager in the Interfaces folder, will also generate repository interface for each entity defined in the Domain project. ServiceManger is implemented in the Services Folder, it will also contain Services for each entities defined in the Domain project.  
-![Imgur](https://i.imgur.com/qgTCBsT.png)  
+Defines Interface for ServiceManager, Services in the ServiceInterfaces folder, implementation of ServiceManager and Services in Services folder, interfaces for RepositoryManager, GenericRepository, Repositories and UnitOfWork in RepositoryInterface folder. 
+![Imgur](https://i.imgur.com/yNEeYTf.png)
 
 **Persistence Project:**     
-ApplicationDbContext should be defined or generated using Entity Framework in the context folder, Repositories folder contains GenericRepository, RepositoryManager and UnitOfWork implementation.  
-![Imgur](https://i.imgur.com/x6HoKdW.png)  
+ApplicationDbContext should be defined or generated using Entity Framework in the context folder, Repositories folder contains GenericRepository, Repositories, RepositoryManager and UnitOfWork implementation.  
+![Imgur](https://i.imgur.com/4vpr121.png)
 
 **Startup Projects:**  
 This is a console application that will create a Generic Host which will help in dependency injection, here ApplicationDbContext is added to the ServiceCollection, this project will help you to run Entity Framework commands to do entity migrations to a database or generate entities and ApplicationDbContext from existing database. It also has a appsettings.json file containing the connection string.  
@@ -124,8 +131,7 @@ Contains classes structures to read from appsettings.json file.
 
 **Program.cs**
 This connect all the wiring between the projects.
-![Imgur](https://i.imgur.com/QBq9PMJ.png)  
-![Imgur](https://i.imgur.com/v1JkFNe.png)  
+![Imgur](https://i.imgur.com/rkcn6vl.png) 
 
 *Once you add more entities, you can **run this template again to generate** controllers for the new Entities in the WebAPI Project.*  
 
@@ -174,7 +180,7 @@ This will create a ClassLibrary project named Clean_Architecture_Program_Generat
 Once all the Data related projects are generated using the "**Clean Architecture Database Access Generator.tt**" template.    
 Domain project by default will be provided one entity named **Sample** and it's Repository and Service.  
 
-![Imgur](https://i.imgur.com/lxHyXsq.png?1)
+![Imgur](https://i.imgur.com/p9we3ju.png)
 When you add new entities in the Domain project under Entities folder:  
 The classes highlighted in green will get generated for **each entity** defined in the Domain project entities folder.    
 The Classes highlighted in red gets re-generated every time with entity details.  
@@ -225,8 +231,7 @@ This will generate all entities in domain project
 Run template:  
 **Clean Architecture Database Access Generator.tt**  
 To generate repositories and Services for the **new entities**
-![Imgur](https://i.imgur.com/6wQVXWg.png)  
-![Imgur](https://i.imgur.com/cArv7MK.png)  
+![Imgur](https://i.imgur.com/VwOeTO5.png)
 ![Imgur](https://i.imgur.com/6hVZab8.png)  
 
 Run template:  
@@ -245,7 +250,7 @@ Run template:
 **Clean Architecture WebMVC Generator.tt**  
 To generate controllers for WebAPI or WebMVC project.  
 ![Imgur](https://i.imgur.com/xuZR1aG.png)  
-
+![Imgur](https://i.imgur.com/IW00oMb.png)
 
 ---
 ## Some useful commands
