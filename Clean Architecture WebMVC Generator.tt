@@ -1,0 +1,642 @@
+﻿<#@ template language="C#" debug="true" hostspecific="true" #>
+<#@ output extension=".txt" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data.Entity" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="EnvDTE" #>
+<#@ include file="T4Helper.ttinclude" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+<#
+    /////////////////////////////
+    // Generate WebMVC project //
+    /////////////////////////////
+    string StartupProject = "WebMVC";
+    CreateWebCoreProject(StartupProject);
+#>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Persistence\Persistence.csproj" />
+  </ItemGroup>
+
+</Project>
+<# OverwriteFile(StartupProject, "", "WebMVC.csproj"); #>
+<#  
+    ////////////////////////////////////////////////////////
+    // Get defined Entities details and DbContext details //
+    ////////////////////////////////////////////////////////
+    string EntityNamespace = "Domain.Entities";
+    string DbContextNamespace = "Persistence.Context";
+    string efContext = "ApplicationDbContext"; //If Context is not in the same namespace rename this to the name of the context
+
+    IServiceProvider serviceProvider = (IServiceProvider)this.Host;
+    DTE dte = serviceProvider.GetService(typeof(DTE)) as DTE; 
+    var project1 = FindProjectByName(dte, "Domain");
+    var classes = FindClasses(project1, EntityNamespace, "");
+    var classNames = classes
+                    .Select(currentClass => currentClass.Name)
+                    .ToList();
+    var project2 = FindProjectByName(dte, "Persistence");
+    var dbcclass = FindClasses(project2, DbContextNamespace, "");
+    var classWithDbContext = dbcclass.FirstOrDefault(currentClass => currentClass.Bases.OfType<CodeElement>().Any(currentBase => currentBase.Name == "DbContext"));
+    if(classWithDbContext != null)
+    {
+        efContext = classWithDbContext.Name;
+    }
+#>
+//////////////////////////////////////////////
+// generated ExceptionHandlingMiddleware.cs //
+//////////////////////////////////////////////
+using Domain.Exceptions;
+using System.Text.Json;
+
+namespace <#= StartupProject #>.Middlewares
+{
+    internal sealed class ExceptionHandlingMiddleware : IMiddleware
+    {
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+
+        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger) => _logger = logger;
+
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        {
+            try
+            {
+                await next(context);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+
+                await HandleExceptionAsync(context, e);
+            }
+        }
+
+        private static async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
+        {
+            httpContext.Response.ContentType = "application/json";
+
+            httpContext.Response.StatusCode = exception switch
+            {
+                BadRequestException => StatusCodes.Status400BadRequest,
+                NotFoundException => StatusCodes.Status404NotFound,
+                _ => StatusCodes.Status500InternalServerError
+            };
+
+            var response = new
+            {
+                error = exception.Message
+            };
+
+            await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response));
+        }
+    }
+}
+<# CreateFile(StartupProject, "Middlewares","ExceptionHandlingMiddleware.cs"); #>
+//////////////////////////
+// generated Program.cs //
+//////////////////////////
+using Serilog;
+using Application;
+using Persistence;
+using <#= StartupProject #>.Middlewares;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var configuration = new ConfigurationBuilder()
+    // Read from your appsettings.json.
+    .AddJsonFile("appsettings.json")
+    // Read from your secrets.
+    //.AddUserSecrets<Program>(optional: true)
+    //.AddEnvironmentVariables()
+    .Build();
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+// added these for this project
+builder.Services.AddPersistence();
+builder.Services.AddApplication();
+
+//this is needed for Serilog.AspNetCore, Serilog.Settings.Configuration, Serilog.Sinks.File, Serilog.Sinks.Console,Serilog.Expressions
+//installed in application project,
+//this project has reference to application project
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(configuration)
+    .CreateLogger();
+builder.Host.UseSerilog();
+
+//this is need for exception handling
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
+var app = builder.Build();
+
+//added to handle exceptions
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+<# OverwriteFile(StartupProject, "","Program.cs"); #>
+<#
+////////////////////////////////
+// generated appsettings.json //
+////////////////////////////////
+#>
+{
+  //define connection here
+  "ConnectionStrings": {
+    "SqlServerDB": "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"
+  },
+  
+  //required to control serilog
+  "Serilog": {
+    "MinimumLevel": "Information",
+    "Override": {
+      "Microsoft.AspNetCore": "Warning"
+    },
+    "WriteTo": [
+      {
+        "Name": "Console"
+      },
+      {
+        "Name": "File",
+        "Args": {
+          "path": "Logs\\AppLogs.log",
+          "outputTemplate": "{Timestamp:HH:mm:ss.fff zzz} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}"
+        }
+      }
+    ],
+    "Filter": [
+      {
+        "Name": "ByExcluding",
+        "Args": {
+          "expression": "StartsWith(SourceContext, 'Microsoft.')"
+        }
+      }
+    ]
+  },
+  "AllowedHosts": "*"
+}
+<# OverwriteFile(StartupProject, "","appsettings.json"); #>
+<#foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+    var controller =  properClassName + "sController";
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors) 
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
+    var propList = FindListOfProperitesOfClass(dte,project1,EntityNamespace+"."+properClassName);
+#>
+////////////////////////////////////
+// generated <#= controller #>.cs //
+////////////////////////////////////
+using Application.ServiceInterfaces;
+using Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace WebMVC.Controllers
+{
+    public class <#= properClassName #>sController : Controller
+    {
+        private readonly ILogger<<#= properClassName #>sController> logger;
+        private readonly IServiceManager _serviceManager;
+
+        public <#= properClassName #>sController(IServiceManager serviceManager, ILogger<<#= properClassName #>sController> logger)
+        {
+            _serviceManager = serviceManager;
+            this.logger = logger;
+        }
+        
+        // GET: <#= properClassName #>
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.GetAll<#= properClassName #>();
+            return View(result.entities);
+        }
+
+        // GET <#= properClassName #>/Details/5
+        public async Task<IActionResult> Details(<#= keyType #>)
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(<#= key #>);
+            return View(result.entity);
+        }
+
+        // GET <#= properClassName #>/Create>
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST <#= properClassName #>/Create>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("<#= propList #>")] <#= properClassName #> entity)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _serviceManager.<#= properClassName #>Service.Add<#= properClassName #>(entity);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(entity);
+        }
+
+        // Get <#= properClassName #>/Edit/5
+        public async Task<IActionResult> Edit(<#= keyType #>)
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(<#= key #>);
+            return View(result.entity);
+        }
+
+        // POST <#= properClassName #>/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(<#= keyType #>, [Bind("<#= propList #>")] <#= properClassName #> entity)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(<#= key #>,entity);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(entity);
+        }
+
+        // Get <#= properClassName #>/Delete/5
+        public async Task<IActionResult> Delete(<#= keyType #>)
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(<#= key #>);
+            return View(result.entity);
+        }
+
+        // POST <<#= properClassName #>/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(<#= keyType #>)
+        {
+            var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(<#= key #>);
+            return RedirectToAction(nameof(Index));
+        }
+    }
+}
+<# CreateFile(StartupProject, "Controllers", controller+".cs"); #>
+<#
+}
+#>
+<#
+////////////////////////////////////
+// generate views loop            //
+////////////////////////////////////
+foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+    var viewfolder =  "Views/"+properClassName+'s';
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors)
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
+    var propList = ProperitesOfClass(dte,project1,EntityNamespace+"."+properClassName);
+#>
+<#
+//////////////////
+// Index.cshtml //
+//////////////////
+#>
+@model IEnumerable<Domain.Entities.<#= properClassName #>>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+<#
+foreach(string property in propList)
+{
+#>
+            <th>
+                @Html.DisplayNameFor(model => model.<#= property #>)
+            </th>
+<#
+}
+#>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+<#
+foreach(string property in propList)
+{
+#>
+            <th>
+                @Html.DisplayFor(modelItem => item.<#= property #>)
+            </th>
+<#
+}
+#>
+            <td>
+                <a asp-action="Edit" <#= asprouteItem #>>Edit</a> |
+                <a asp-action="Details" <#= asprouteItem #>>Details</a> |
+                <a asp-action="Delete" <#= asprouteItem #>>Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<# CreateFile(StartupProject, viewfolder, "Index.cshtml"); #>
+<#
+/////////////////
+// Edit.cshtml //
+/////////////////
+#>
+@model Domain.Entities.<#= properClassName #>
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4><#= properClassName #></h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <#= aspfors #>
+<#
+var keyList = key.Split(',');
+foreach(string property in propList)
+{
+#>
+            <#
+            if(keyList.Contains(property))
+            {
+            #>
+            <div class="form-group">
+                <label asp-for="<#= property #>" class="control-label"></label>
+                <input asp-for="<#= property #>" disabled="disabled" class="form-control" />
+                <span asp-validation-for="<#= property #>" class="text-danger"></span>
+            </div>
+            <#
+            }
+            else
+            {
+            #>
+            <div class="form-group">
+                <label asp-for="<#= property #>" class="control-label"></label>
+                <input asp-for="<#= property #>" class="form-control" />
+                <span asp-validation-for="<#= property #>" class="text-danger"></span>
+            </div>
+            <#
+            }
+            #>
+<#
+}
+#>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<# CreateFile(StartupProject, viewfolder, "Edit.cshtml"); #>
+<#
+////////////////////
+// Details.cshtml //
+////////////////////
+#>
+@model Domain.Entities.<#= properClassName #>
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4><#= properClassName #></h4>
+    <hr />
+    <dl class="row">
+<#
+foreach(string property in propList)
+{
+#>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.<#= property #>)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.<#= property #>)
+        </dd>
+<#
+}
+#>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit"  <#= asprouteModel #>>Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+<# CreateFile(StartupProject, viewfolder, "Details.cshtml"); #>
+<#
+///////////////////
+// Delete.cshtml //
+///////////////////
+#>
+@model Domain.Entities.<#= properClassName #>
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4><#= properClassName #></h4>
+    <hr />
+    <dl class="row">
+<#
+foreach(string property in propList)
+{
+#>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.<#= property #>)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.<#= property #>)
+        </dd>
+<#
+}
+#>
+    </dl>
+   
+    <form asp-action="Delete">
+        <#= aspfors #>
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>
+<# CreateFile(StartupProject, viewfolder, "Delete.cshtml"); #>
+<#
+///////////////////
+// Create.cshtml //
+///////////////////
+#>
+@model Domain.Entities.<#= properClassName #>
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4><#= properClassName #></h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<#
+foreach(string property in propList)
+{
+#>
+            <div class="form-group">
+                <label asp-for="<#= property #>" class="control-label"></label>
+                <input asp-for="<#= property #>" class="form-control" />
+                <span asp-validation-for="<#= property #>" class="text-danger"></span>
+            </div>
+<#
+}
+#>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<# CreateFile(StartupProject, viewfolder, "Create.cshtml"); #>
+
+<#
+}
+////////////////////////////////////
+// end loop of generate views     //
+////////////////////////////////////
+#>
+<#
+////////////////////
+// _Layout.cshtml //
+////////////////////
+#>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WebMVC</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebMVC.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebMVC</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+<#
+foreach(string className in classNames)
+{
+    var properClassName = GetProperClassName(className);
+#>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="<#= properClassName #>s" asp-action="Index"><#= properClassName #>s</a>
+                        </li>
+<#
+}
+#>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2022 - WebMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+<# OverwriteFile(StartupProject, "Views/Shared", "_Layout.cshtml"); #>

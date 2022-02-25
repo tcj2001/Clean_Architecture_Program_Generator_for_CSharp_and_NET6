@@ -11,13 +11,12 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Reflection" #>
-
 <#
     /////////////////////////////
     // Generate WebAPI project //
     /////////////////////////////
     string StartupProject = "WebAPI";
-    CreateWebProject("WebAPI");
+    CreateWebCoreProject(StartupProject);
 #>
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
@@ -36,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Persistence\Persistence.csproj" />
   </ItemGroup>
 
@@ -304,7 +302,6 @@ app.Run();
 {
   //define connection here
   "ConnectionStrings": {
-    "SqliteDB": "DataSource=app.db;Cache=Shared",
     "SqlServerDB": "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"
   },
   
@@ -347,33 +344,35 @@ app.Run();
 <#foreach(string className in classNames)
 {
     var properClassName = GetProperClassName(className);
-    var controller =  properClassName + "Controller";
-    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    var controller =  properClassName + "sController";
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors) 
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 ////////////////////////////////////
 // generated <#= controller #>.cs //
 ////////////////////////////////////
-using Application.Interfaces;
+using Application.ServiceInterfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace Presentation.API.Controllers
+namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class <#= properClassName #>Controller : ControllerBase
+    public class <#= properClassName #>sController : ControllerBase
     {
-        private readonly ILogger<<#= properClassName #>Controller> logger;
+        private readonly ILogger<<#= properClassName #>sController> logger;
         private readonly IServiceManager _serviceManager;
 
-        public <#= properClassName #>Controller(IServiceManager serviceManager, ILogger<<#= properClassName #>Controller> logger)
+        public <#= properClassName #>sController(IServiceManager serviceManager, ILogger<<#= properClassName #>sController> logger)
         {
             _serviceManager = serviceManager;
             this.logger = logger;
         }
+
         // GET: api/<<#= properClassName #>Controller>
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -383,10 +382,10 @@ namespace Presentation.API.Controllers
         }
 
         // GET api/<<#= properClassName #>Controller>/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(<#= key1Type #> id)
+        [HttpGet("<#= httpKeys #>")]
+        public async Task<IActionResult> Get(<#= keyType #>)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(id);
+            var result = await _serviceManager.<#= properClassName #>Service.Get<#= properClassName #>ById(<#= key #>);
             return Ok(result.entity);
         }
 
@@ -400,17 +399,17 @@ namespace Presentation.API.Controllers
 
         // PUT api/<<#= properClassName #>Controller>/5
         [HttpPut()]
-        public async Task<IActionResult> Put([FromBody] <#= properClassName #> entity)
+        public async Task<IActionResult> Put(<#= keyType #>, [FromBody] <#= properClassName #> entity)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(entity);
+            var result = await _serviceManager.<#= properClassName #>Service.Update<#= properClassName #>(<#= key #>, entity);
             return Ok(result);
         }
 
         // DELETE api/<<#= properClassName #>Controller>/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(<#= key1Type #> id)
+        [HttpDelete("<#= httpKeys #>")]
+        public async Task<IActionResult> Delete(<#= keyType #>)
         {
-            var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(id);
+            var result = await _serviceManager.<#= properClassName #>Service.Remove<#= properClassName #>(<#= key #>);
             return Ok(result);
         }
     }

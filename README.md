@@ -1,13 +1,10 @@
-﻿# Clean Architecture Solution Program Generator  
-Program Generator to **generate** Clean Architecture base project structure solution containing Repositories, Services and Controllers.  
+﻿# Clean Architecture Style Code Generator  
+This is a .Net Core Clean Architecture style code generator which will generate Domain project containing entities; Application project containing repository interfaces, service interfaces, service implementations; Persistence project containg ApplicationDbcontext, repository implementations; it will also generate controllers for each entity in the WebAPI or WEBMVC project.  
+
 
 ---
 ## Table of Contents
 - [Getting Started](#getting-started)
-- Installed Files
-    * [Clean Architecture Database Access Generator.tt](#clean-architecture-database-access-generator.tt)
-    * [Clean Architecture WebAPI Generator.tt](#clean-architecture-webapi-generator.tt)
-    * [T4Helper.ttinclude](#t4Helper.ttinclude) 
 - [Github Link](#github-link)
 - [Installing template from Nuget Package Manager](#installing-template-from-nuget-package-manager)
 - [How to check if this really works](#how-to-check-if-this-really-works)
@@ -18,62 +15,66 @@ Program Generator to **generate** Clean Architecture base project structure solu
 
 ---
 # Getting Started
-This is a NuGet package should be installed as a template in dotnet cli.  
+This is a NuGet package that should be installed as a template in dotnet cli.  
 You can browse this package using manage NuGet packages by searching for "Thomson Mathews" or "Clean_Architecture_Program_Generator_for_CSharp_and_NET6"  
 ![Imgur](https://i.imgur.com/9N0loaV.png)  
 This will install two template files in your project.  
 [Clean Architecture Database Access Generator.tt](#clean-architecture-database-access-generator.tt)  
 [Clean Architecture WebAPI Generator.tt](#clean-architecture-webapi-generator.tt)  
-![Imgur](https://i.imgur.com/8R9B6rS.png)  
+[Clean Architecture WebMVC Generator.tt](#clean-architecture-webmvc-generator.tt)  
+![Imgur](https://i.imgur.com/tSuZX6y.png)
+
 Once these template files are installed.   
 
-Run the all templates using "Transform All T4 Templates" from the build menu.  
-![Imgur](https://i.imgur.com/G6tc5vK.png)  
-or
-Run individual template by right click on the template and select "Run Custom Tool"
-![Imgur](https://i.imgur.com/ZIdjSuG.png)  
+Run **Clean Architecture Database Access Generator.tt** template by right clicking on the template and select "Run Custom Tool".  
+![Imgur](https://i.imgur.com/MpsMt8f.png) 
 
 This will generate the following projects.  
-![Imgur](https://i.imgur.com/mbJYKGZ.png)  
-Now define entities in the Domain Project using code first approach or database first approach 
-![Imgur](https://i.imgur.com/eW5s1uW.png)  
-and run the transformation again.  
+![Imgur](https://i.imgur.com/qsjnhqG.png)
+Now define entities in the Domain Project entities folder using code first approach or database first approach and ApplicationDbContext in Persistence project context folder.  
+![Imgur](https://i.imgur.com/G1zoCm5.png)
+**Run Clean Architecture Database Access Generator.tt again** to generate all repositories, services for the each entity.  
 
-**Voila! all repositories, services and controller are generated for you by the templates.**  
+**Run Clean Architecture WebAPI Generator.tt** to generate API controllers in WebAPI project.   
 
-Now just set WebAPI as a startup project and run it, that's it.  
+**Run Clean Architecture WebMVC Generator.tt** to generate MVC controllers in WebMVC project.   
+
+set WebAPI or WebMVC as a startup project.    
+
+**Voila! a working WebAPI or WebMVC is ready for you**.  
+
+if more entities are added, just run all these three transformation again, that's it.
 
 ---
 ## Clean Architecture Database Access Generator.tt
 This template will generate 4 projects:  
 Domain, Application, Persistence, Startup.  
-![Imgur](https://i.imgur.com/IqyphaF.png)  
+![Imgur](https://i.imgur.com/qsjnhqG.png) 
 
 **Domain Project:**  
-Define all entities in Entities folder, either using code first approach or database approach, Exceptions folder defines some basic useful exceptions that can be used in global error handling, Interface folder contains GenreicRepository, RepositoryManager and UnitOfWork interfaces that is implemented in the Persistence project.  
-![Imgur](https://i.imgur.com/i7ZTVsl.png)  
+Define all entities in Entities folder, either using code first approach or database approach, Exceptions folder defines some basic useful exceptions that can be used in global error handling.  
+![Imgur](https://i.imgur.com/CASrxLn.png)
 
 **Application Project**  
-Defines Interface for ServiceManager in the Interfaces folder, will also generate repository interface for each entity defined in the Domain project. ServiceManger is implemented in the Services Folder, it will also contain Services for each entities defined in the Domain project.  
-![Imgur](https://i.imgur.com/qgTCBsT.png)  
+Defines Interface for ServiceManager, Services in the ServiceInterfaces folder, implementation of ServiceManager and Services in Services folder, interfaces for RepositoryManager, GenericRepository, Repositories and UnitOfWork in RepositoryInterface folder. 
+![Imgur](https://i.imgur.com/yNEeYTf.png)
 
 **Persistence Project:**     
-ApplicationDbContext should be defined or generated using Entity Framework in the context folder, Repositories folder contains GenericRepository, RepositoryManager and UnitOfWork implementation.  
-![Imgur](https://i.imgur.com/x6HoKdW.png)  
-Modify AddPersistenceExtension class to refer to correct connection string.  
-![Imgur](https://i.imgur.com/rRvAvrW.png)  
-
+ApplicationDbContext should be defined or generated using Entity Framework in the context folder, Repositories folder contains GenericRepository, Repositories, RepositoryManager and UnitOfWork implementation.  
+![Imgur](https://i.imgur.com/4vpr121.png)
 
 **Startup Projects:**  
-This is a console application that will create a Generic Host which will help in dependency injection, here ApplicationDbContext is added to the ServiceCollection, this project will help you to run Entity framework commands to do entity migrations to a database or generate entities and ApplicationDbContext from existing database.  
-![Imgur](https://i.imgur.com/vZZcObV.png)  
+This is a console application that will create a Generic Host which will help in dependency injection, here ApplicationDbContext is added to the ServiceCollection, this project will help you to run Entity Framework commands to do entity migrations to a database or generate entities and ApplicationDbContext from existing database. It also has a appsettings.json file containing the connection string.  
+![Imgur](https://i.imgur.com/kMkKoIn.png)  
 
-Startup project is only used to run Entity framework commands with out a WebAPI project and is not required if WebAPI project is generated.  
+Startup project is only used to run Entity Framework commands with out a WebAPI project and is not required if WebAPI project is generated.  
 
 *Once you add more entities, you can **run this template again to generate** repository interfaces for the new Entities in the Domain Project, repository implementation for the new Entities in Persistence Project and Services and its Service interfaces for the new Entities in the Application Project*.  
 
 ---
 ## Clean Architecture WebAPI Generator.tt
+This template will open a dialog box, select "**ASP.NET Core Web API**" project template to generate a initial skelton of Web API project which will be modified by the "Clean Architecture WebAPI Generator template" 
+
 This template will generate open a dialog box, select ASP.NET Core WebAPI project and it will create a project named **WebAPI**
 ![Imgur](https://i.imgur.com/V7yfIId.png)  
 
@@ -104,6 +105,39 @@ This connect all the wiring between the projects.
 *Once you add more entities, you can **run this template again to generate** controllers for the new Entities in the WebAPI Project.*  
 
 ---
+## Clean Architecture WebMVC Generator.tt
+This template will open a dialog box, select "**ASP.NET Core Web app (Mode-View-Controller)**" project template to generate a initial skelton of MVC project which will be modified by the "Clean Architecture WebMVC Generator template" 
+it will create a project named **WebAPI**
+![Imgur](https://i.imgur.com/V7yfIId.png)  
+
+**WebAPI Project:**  
+This contains controllers and other required classes.  
+![Imgur](https://i.imgur.com/YcDbpv4.png)  
+
+**Controller Folder:**  
+Contains generated controller for each entities defined in Domain project.  
+
+**Extensions Folder:**  
+Contains extension method to add BasicAuthMiddleware to the HTTP request pipeline.    
+
+**MiddleWare Folder:**     
+Contains implementation for BasicAuthMiddleware and ExceptionHandlingMiddleware.  
+
+**Appsetting.json:**   
+Contains configuration for Serilog logging, connection string and basic authentication details.  
+
+**Appsetting Folder:**   
+Contains classes structures to read from appsettings.json file.    
+
+**Program.cs**
+This connect all the wiring between the projects.
+![Imgur](https://i.imgur.com/rkcn6vl.png) 
+
+*Once you add more entities, you can **run this template again to generate** controllers for the new Entities in the WebAPI Project.*  
+
+
+
+---
 ## T4Helper.ttinclude
 This file contains function used by the above T4Template files.
 
@@ -132,73 +166,91 @@ Go to a directory where you want to make use of the template and type command.
 ![Imgur](https://i.imgur.com/yqz8I1l.png)  
 
 This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within the solution  
-![Imgur](https://i.imgur.com/qDOcoGn.png)  
+![Imgur](https://i.imgur.com/sBLfNRD.png)
 
 **Second Method**.  
 When you select new project in visual studio you will see a template named Clean_Architecture_Program_Generator_for_CSharp_and_NET6, if you don't see filter the project type and select Clean Architecture, select this template and create your project.   
 ![Imgur](https://i.imgur.com/tlgWJjY.png)  
 
 This will create a ClassLibrary project named Clean_Architecture_Program_Generator_for_CSharp_and_NET6 within YourProjectFolderName.    
-![Imgur](https://i.imgur.com/XBmdPGL.png)  
+![Imgur](https://i.imgur.com/sBLfNRD.png)
   
 ---
 ## How to check if this really works
-Once all the projects are generated using the T4Templates  
-By default Domain project will contains one entity named Sample.cs, it also generated Repository and Services for sample entity.  
+Once all the Data related projects are generated using the "**Clean Architecture Database Access Generator.tt**" template.    
+Domain project by default will be provided one entity named **Sample** and it's Repository and Service.  
+
+![Imgur](https://i.imgur.com/p9we3ju.png)
+When you add new entities in the Domain project under Entities folder:  
 The classes highlighted in green will get generated for **each entity** defined in the Domain project entities folder.    
 The Classes highlighted in red gets re-generated every time with entity details.  
-![Imgur](https://i.imgur.com/lxHyXsq.png)  
+
+Startup project adds ApplicationDbContext to the service collection for dependency injection and points to a database, **change** the the connection string as needed, before you proceed to next step.   
+![Imgur](https://i.imgur.com/zEEwBBJ.png)
 
 ## Code First approach 
-Since we already have a sample entity defined for you by the template, I will just make use of it.   
-Just for simplicity let's create a SQLite database to hold a table for Sample entity in app.db by running these commands.  
-**dotnet ef migrations add "initialmigration2" --project Persistence --startup-project WebAPI**    
-**dotnet ef database update --project Persistence --startup-project WebAPI**  
-![Imgur](https://i.imgur.com/UDldadJ.png)  
+Since we already have a sample entity defined for you by the template, let's just make use of it.   
 
-This will create App.db in WebAPI folder with a table named Sample.  
+In the Startup project modify appsettings.json to edit the connection string.  
+![Imgur](https://i.imgur.com/x7yNBU4.png)  
 
-In the appsettings.json we already have two connections string pre-defined.  
-![Imgur](https://i.imgur.com/7mh67uJ.png)  
 
-Make sure class AddPersistenceExtension in Persistence project has  
-services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=SqliteDb"));
-![Imgur](https://i.imgur.com/eab4hcV.png)  
+**dotnet ef migrations add "Add Sample entity to Database" --project Persistence --startup-project Startup**    
+**dotnet ef database update --project Persistence --startup-project Startup**  
+![Imgur](https://i.imgur.com/qaY1YRK.png)    
+
+These commands will add Sample table to the database.    
+
+Note: Here **Startup** project is used to run Entity Framework commands.
+
+Now use **Clean Architecture WebAPI Generator.tt** to generate **WebAPI** project.
+This will also create a controller for the Sample entity in the project.  
+
+Update the WebAPI projects appsetting.json to point to the correct database.  
 
 **Set WebAPI as a startup project and run it.**  
 ![Imgur](https://i.imgur.com/OGxNSBs.png)  
 
 
 ## Database First approach
-Here we will make use of a BookStores database in my Sql Server setup. 
+Here we will make use of a BookStoresDB database in a Sql Server setup. 
 This database was grabbed from internet, credit goes to the person who made it available for community.
-![Imgur](https://i.imgur.com/7mh67uJ.png)  
+![Imgur](https://i.imgur.com/0qdEcWC.png)  
 
-Make sure class AddPersistenceExtension in Persistence project has  
-services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDb"))
-![Imgur](https://i.imgur.com/iMsZMGg.png)  
+In the Startup project modify appsettings.json to edit the connection string.
+![Imgur](https://i.imgur.com/x7yNBU4.png)  
 
-Run this command with a connection string pointing to your Sql Server Database.  
-**scaffold-DbContext -Connection "Name=SqlServerDB" -Provider Microsoft.EntityFrameworkCore.SqlServer -Project Persistence -StartupProject WebAPI -OutputDir ..\Domain\Entities -Context ApplicationDbContext -ContextDir ..\Persistence\Context -Namespace Domain.Entities -ContextNamespace Persistence.Context -DataAnnotations -force**  
+Run this command to generate entities in the domain\Entities folder and ApplicationDbContect in Persitence\Context folder.  
+**scaffold-DbContext -Connection "Name=SqlServerDB" -Provider Microsoft.EntityFrameworkCore.SqlServer -Project Persistence -StartupProject Startup -OutputDir ..\Domain\Entities -Context ApplicationDbContext -ContextDir ..\Persistence\Context -Namespace Domain.Entities -ContextNamespace Persistence.Context -DataAnnotations -force**  
+
+*note: if scaffold-DbContext uses a Named connection string, you won't be able to add controllers using visual studio in-built scaffolded mechanism, you can avoid that by providing connection string directly in the scaffold-DbContext command.  
 
 This will generate all entities in domain project  
 ![Imgur](https://i.imgur.com/RN1FCHt.png)  
 
-Run all templates  
-![Imgur](https://i.imgur.com/G6tc5vK.png)  
+Run template:  
+**Clean Architecture Database Access Generator.tt**  
+To generate repositories and Services for the **new entities**
+![Imgur](https://i.imgur.com/VwOeTO5.png)
+![Imgur](https://i.imgur.com/6hVZab8.png)  
 
-or individual template  
-![Imgur](https://i.imgur.com/ZIdjSuG.png)  
+Run template:  
+**Clean Architecture WebAPI Generator.tt**  
+To generate controllers for WebAPI project.  
+![Imgur](https://i.imgur.com/vEowcAL.png)  
 
-All repositories, services and controllers are generated for you.  
-![Imgur](https://i.imgur.com/drJXm4q.png)  
-![Imgur](https://i.imgur.com/m8tcvzR.png)  
+Update the WebAPI projects appsetting.json to point to the correct database.  
 
 Set WebAPI as a startup project and run it.  
 ![Imgur](https://i.imgur.com/bBLUjZD.png)  
-
 By default the WebAPI uses BasicAuthentication the userid and password is defined in the appsettings.json file  
 ![Imgur](https://i.imgur.com/SoB2Ame.png)  
+
+Run template:  
+**Clean Architecture WebMVC Generator.tt**  
+To generate controllers for WebAPI or WebMVC project.  
+![Imgur](https://i.imgur.com/xuZR1aG.png)  
+![Imgur](https://i.imgur.com/IW00oMb.png)
 
 ---
 ## Some useful commands
@@ -217,10 +269,9 @@ If possible do not use connection string directly in the above command.
 
 if you have an appsettings.json define connection strings as shown  
   "ConnectionStrings": {
-    "SqliteDB": "DataSource=app.db;Cache=Shared",
     "SqlServerDB": "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"
   }  
-then use "Name=SqliteDB" in the scaffold-DbContext -Connection parameter
+then use "Name=SqlServerDB" in the scaffold-DbContext -Connection parameter
 
 
 **Remove migration**  
@@ -229,7 +280,7 @@ dotnet ef migrations remove
 **List migrations**    
 dotnet ef migrations list
 
-**Install entity frame work**    
+**Install Entity Framework**    
 dotnet tool install --global dotnet-ef  
 dotnet tool update --global dotnet-ef  
 

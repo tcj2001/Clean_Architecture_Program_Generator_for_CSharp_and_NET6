@@ -40,7 +40,11 @@ namespace Domain.Entities
     public class Sample
     {
         [Key]
-        public int Id { get; set; }
+        public int Id1 { get; set; }
+        [Key]
+        public int Id2 { get; set; }
+        [Key]
+        public int Id3 { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
     }
@@ -79,7 +83,7 @@ namespace Domain.Entities
 //////////////////////////////////////////
 // generated AddApplicationExtension.cs //
 //////////////////////////////////////////
-using Application.Interfaces;
+using Application.ServiceInterfaces;
 using Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -116,7 +120,6 @@ namespace Application
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -139,29 +142,46 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Context
 {
-    public class ApplicationDbContext : DbContext
+    public partial class ApplicationDbContext : DbContext
     {
+        public ApplicationDbContext()
+        {
+        }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
         }
 
+        public virtual DbSet<Sample> Samples { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite("DataSource=app.db;Cache=Shared");
+                optionsBuilder.UseSqlServer("Name=SqlServerDB");
             }
         }
 
-        public DbSet<Sample> Samples { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+        
+            modelBuilder.Entity<Sample>(entity =>
+            {
+                entity.HasKey(e => new { e.Id1, e.Id2, e.Id3 });
+            });
+            
+            OnModelCreatingPartial(modelBuilder);
+        }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
 <# CreateFile("Persistence", "Context","ApplicationDbContext.cs"); #>
 //////////////////////////////////////////
 // generated AddPersistenceExtension.cs //
 //////////////////////////////////////////
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
 using Persistence.Context;
 using Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -173,8 +193,7 @@ namespace Persistence
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Name=SqliteDB"));
-            //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDB"));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDB"));
             services.AddScoped<IRepositoryManager, RepositoryManager>();
             return services;
         }
@@ -204,11 +223,29 @@ namespace Persistence
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Persistence\Persistence.csproj" />
   </ItemGroup>
 
 </Project>
 <# OverwriteFile("Startup", "","Startup.csproj"); #>
+<#
+////////////////////////////////
+// generated appsettings.json //
+////////////////////////////////
+#>
+{
+  //define connection here
+  "ConnectionStrings": {
+    "SqlServerDB": "Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"
+  }
+}
+<# OverwriteFile("Startup", "","appsettings.json"); #>
 //////////////////////////
 // generated Program.cs //
 /////////////////////////
@@ -216,6 +253,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Persistence.Context;
+using System.Reflection;
 
 namespace startup
 {
@@ -224,12 +262,11 @@ namespace startup
         public static async Task Main(string[] args)
         {
             await Host.CreateDefaultBuilder(args)
+                .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
                 .ConfigureServices((hostContext, services) =>
                 {
                     //required if you are using entity framework
-                    //now using Sqllite as database
-                    services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("DataSource=app.db"));
-                    //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Server=DESKTOP-GBANT4V; Database=BookStoresDB; Trusted_Connection=True;"));
+                    services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("Name=SqlServerDB"));
                 })
                 .RunConsoleAsync();
         }
@@ -242,7 +279,7 @@ namespace startup
     ////////////////////////////////////////////////////////
     string EntityNamespace = "Domain.Entities";
     string DbContextNamespace = "Persistence.Context";
-    string efContext = "ApplicationDbContext"; //If Context is not in the same namespace rename this to the name of the context
+    string efContext = "ApplicationDbContext";
 
     IServiceProvider serviceProvider = (IServiceProvider)this.Host;
     DTE dte = serviceProvider.GetService(typeof(DTE)) as DTE; 
@@ -264,25 +301,22 @@ namespace startup
 /////////////////////////////////////
 using System.Linq.Expressions;
 
-namespace Domain.Interfaces
+namespace Application.RepositoryInterfaces
 {
     public interface IGenericRepository<T> where T : class
     {
-        ValueTask<T?> GetById(int id);
-        ValueTask<T?> GetById(string id);
         Task<IEnumerable<T>> GetAll();
         Task<IEnumerable<T>> Find(Expression<Func<T, bool>> expression);
         Task Add(T entity);
         void Remove(T entitiy);
         void Update(T entitiy);
-
     }
 }
-<# CreateFile("Domain", "Interfaces","IGenericRepository.cs"); #>
+<# CreateFile("Application", "RepositoryInterfaces","IGenericRepository.cs"); #>
 ////////////////////////////////////
 // generated GenericRepository.cs //
 ////////////////////////////////////
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
 using Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -299,14 +333,6 @@ namespace Persistence.Repositories
             _context = context;
         }
 
-        public virtual async ValueTask<T?> GetById(int id)
-        {
-            return await _context.Set<T>().FindAsync(id);
-        }
-        public virtual async ValueTask<T?> GetById(string id)
-        {
-            return await _context.Set<T>().FindAsync(id);
-        }
         public virtual async Task<IEnumerable<T>> GetAll()
         {
             return await _context.Set<T>().ToListAsync();
@@ -334,21 +360,24 @@ namespace Persistence.Repositories
 //////////////////////////////
 // generated IUnitOfWork.cs //
 //////////////////////////////
-namespace Domain.Interfaces
+using Microsoft.EntityFrameworkCore;
+namespace Application.RepositoryInterfaces
 {
     public interface IUnitOfWork
     {
+        DbContext GetContext();
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(CancellationToken cancellationToken = default);
         Task<int> CompleteAsync(CancellationToken cancellationToken = default);
     }
 }
-<# CreateFile("Domain", "Interfaces","IUnitOfWork.cs"); #>
+<# CreateFile("Application", "RepositoryInterfaces","IUnitOfWork.cs"); #>
 /////////////////////////////
 // generated UnitOfWork.cs //
 /////////////////////////////
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
 using Persistence.Context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 
@@ -356,13 +385,18 @@ namespace Persistence.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly ApplicationDbContext _context;
+        public readonly ApplicationDbContext _context;
 
         private IDbContextTransaction _transaction;
 
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        public DbContext GetContext()
+        {
+            return _context;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
@@ -402,6 +436,20 @@ namespace Domain.Exceptions
     }
 }
 <# CreateFile("Domain", "Exceptions","BadRequestException.cs"); #>
+//////////////////////////////////
+// generated BadKeyException.cs //
+//////////////////////////////////
+namespace Domain.Exceptions
+{
+    public sealed class BadKeyException : BadRequestException
+    {
+        public BadKeyException(string entity, string? entityId, string? passedId)
+            : base(String.Format("Passed key {2} not matching Entity {0} key {1}.", entity, entityId, passedId))
+        {
+        }
+    }
+}
+<# CreateFile("Domain", "Exceptions","BadKeyException.cs"); #>
 ////////////////////////////////////
 // generated NotFoundException.cs //
 ////////////////////////////////////
@@ -422,7 +470,7 @@ namespace Domain.Exceptions
 {
     public sealed class EntityKeyFoundException : BadRequestException
     {
-        public EntityKeyFoundException(string entity, string id)
+        public EntityKeyFoundException(string entity, string? id)
             : base(String.Format("Entity {0} with the identifier {1} exist.", entity, id))
         {
         }
@@ -436,7 +484,7 @@ namespace Domain.Exceptions
 {
     public sealed class EntityKeyNotFoundException : NotFoundException
     {
-        public EntityKeyNotFoundException(string entity, string id)
+        public EntityKeyNotFoundException(string entity, string? id)
             : base(String.Format("Entity {0} with the identifier {1} was not found.", entity, id))
         {
         }
@@ -447,21 +495,22 @@ namespace Domain.Exceptions
 {
     var properClassName = GetProperClassName(className);
     var repositoryName =  properClassName + "Repository";
-    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors) 
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 /////////////////////////////////////////
 // generated I<#= repositoryName #>.cs //
 /////////////////////////////////////////
 using Domain.Entities;
 
-namespace Domain.Interfaces
+namespace Application.RepositoryInterfaces
 {
     public interface I<#= repositoryName #> : IGenericRepository<<#= properClassName #>>
     {
-        //Task<IEnumerable<<#= properClassName #>>> Get<#= properClassName #>ByName(string name);
+        ValueTask<<#= properClassName #>?> GetById(<#= keyType #>);
     }
 }
-<# CreateFile("Domain", "Interfaces", "I"+repositoryName+".cs"); #>
+<# CreateFile("Application", "RepositoryInterfaces", "I"+repositoryName+".cs"); #>
 <#
 }
 #>
@@ -469,13 +518,14 @@ namespace Domain.Interfaces
 {
     var properClassName = GetProperClassName(className);
     var repositoryName =  properClassName + "Repository";
-    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors)
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 ////////////////////////////////////////
 // generated <#= repositoryName #>.cs //
 ////////////////////////////////////////
+using Application.RepositoryInterfaces;
 using Domain.Entities;
-using Domain.Interfaces;
 using Persistence.Context;
 
 namespace Persistence.Repositories
@@ -486,10 +536,10 @@ namespace Persistence.Repositories
         {
             _context = context;
         }
-        //public async Task<IEnumerable<<#= properClassName #>>> Get<#= properClassName #>ByName(string name)
-        //{
-        //    return await _context.Set<<#= properClassName #>>().Where(x => x.Name == name).ToListAsync();
-        //}
+        public async ValueTask<<#= properClassName #>?> GetById(<#= keyType #>)
+        {
+            return await _context.Set<<#= properClassName #>>().FindAsync(<#= key #>);
+        }
     }
 }
 <# CreateFile("Persistence", "Repositories", repositoryName+".cs"); #>
@@ -500,7 +550,8 @@ namespace Persistence.Repositories
 {
     var properClassName = GetProperClassName(className);
     var serviceName =  properClassName + "Service";
-    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors)
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 //////////////////////////////////////
 // generated I<#= serviceName #>.cs //
@@ -508,19 +559,19 @@ namespace Persistence.Repositories
 using Domain.Entities;
 using System.Linq.Expressions;
 
-namespace Application.Interfaces
+namespace Application.ServiceInterfaces
 {
     public interface I<#= properClassName #>Service
     {
         Task<string> Add<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default);
         Task<(IEnumerable<<#= properClassName #>> entities, string Message)> Find<#= properClassName #>(Expression<Func<<#= properClassName #>, bool>> expression, CancellationToken cancellationToken = default);
         Task<(IEnumerable<<#= properClassName #>> entities, string Message)> GetAll<#= properClassName #>(CancellationToken cancellationToken = default);
-        Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
-        Task<string> Remove<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default);
-        Task<string> Update<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default);
+        Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= keyType #>, CancellationToken cancellationToken = default);
+        Task<string> Remove<#= properClassName #>(<#= keyType #>, CancellationToken cancellationToken = default);
+        Task<string> Update<#= properClassName #>(<#= keyType #>, <#= properClassName #> entity, CancellationToken cancellationToken = default);
     }
 }
-<# CreateFile("Application", "Interfaces", "I"+serviceName+".cs"); #>
+<# CreateFile("Application", "ServiceInterfaces", "I"+serviceName+".cs"); #>
 <#
 }
 #>
@@ -529,16 +580,18 @@ namespace Application.Interfaces
     var properClassName = GetProperClassName(className);
     var serviceName =  properClassName + "Service";
     var repositoryName =  properClassName + "Repository";
-    (var key1,var key1Type) = GetKeyPropertyOfAClass(dte,project1,EntityNamespace+"."+properClassName);
+    (var keyType, var key, var keyValue, var checkKeyEqual, var entityKeys, var entityValue, var httpKeys, var asprouteItem, var asprouteModel, var aspfors) 
+    = GetKeyAndTypeStrings(dte,project1,EntityNamespace+"."+properClassName);
 #>
 /////////////////////////////////////
 // generated <#= serviceName #>.cs //
 /////////////////////////////////////
-using Application.Interfaces;
 using Domain.Entities;
 using Domain.Exceptions;
-using Domain.Interfaces;
+using Application.ServiceInterfaces;
+using Application.RepositoryInterfaces;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -562,12 +615,12 @@ namespace Application.Services
             return (items, "<#= properClassName #> records retrieved");
         }
 
-        public async Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default)
+        public async Task<(<#= properClassName #>? entity, string Message)> Get<#= properClassName #>ById(<#= keyType #>, CancellationToken cancellationToken = default)
         {
-            var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key1 #>);
+            var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key #>);
             if (item == null)
             {
-                throw new EntityKeyNotFoundException("<#= properClassName #>", <#= key1 #>.ToString());
+                throw new EntityKeyNotFoundException("<#= properClassName #>", <#= keyValue #>);
             }
             return (item, "<#= properClassName #> record retrieved");
         }
@@ -576,10 +629,10 @@ namespace Application.Services
         {
             if (entity != null)
             {
-                var item = await _repositoryManager.<#= properClassName #>Repository.GetById(entity.<#= key1 #>);
+                var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= entityKeys #>);
                 if (item != null)
                 {
-                    throw new EntityKeyFoundException("<#= properClassName #>", entity.<#= key1 #>.ToString());
+                    throw new EntityKeyFoundException("<#= properClassName #>", <#= entityValue #>);
                 }
                 else
                 {
@@ -591,12 +644,12 @@ namespace Application.Services
             throw new Exception("Add Error");
         }
 
-        public async Task<string> Remove<#= properClassName #>(<#= key1Type #> <#= key1 #>, CancellationToken cancellationToken = default)
+        public async Task<string> Remove<#= properClassName #>(<#= keyType #>, CancellationToken cancellationToken = default)
         {
-            var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key1 #>);
+            var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key #>);
             if (item == null)
             {
-                throw new EntityKeyNotFoundException("<#= properClassName #>", <#= key1 #>.ToString());
+                throw new EntityKeyNotFoundException("<#= properClassName #>", <#= keyValue #>);
             }
             else
             {
@@ -606,27 +659,32 @@ namespace Application.Services
             }
         }
 
-        public async Task<string> Update<#= properClassName #>(<#= properClassName #> entity, CancellationToken cancellationToken = default)
+        public async Task<string> Update<#= properClassName #>(<#= keyType #>, <#= properClassName #> entity, CancellationToken cancellationToken = default)
         {
-            if (entity != null)
+            if(!(<#= checkKeyEqual #>))
             {
-                var item = await _repositoryManager.<#= properClassName #>Repository.GetById(entity.<#= key1 #>);
+                throw new BadKeyException("<#= properClassName #>", <#= entityValue #>, <#= keyValue #>);
+            }
+
+            _repositoryManager.UnitOfWork.GetContext().Entry(entity).State = EntityState.Modified;
+
+            try
+            { 
+                _repositoryManager.UnitOfWork.CompleteAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                var item = await _repositoryManager.<#= properClassName #>Repository.GetById(<#= key #>);
                 if (item == null)
                 {
-                    throw new EntityKeyNotFoundException("<#= properClassName #>", entity.<#= key1 #>.ToString());
+                    throw new EntityKeyNotFoundException("<#= properClassName #>", <#= keyValue #>);
                 }
                 else
                 {
-                    //only place that need change if structure changes
-                    //item.Name = entity.Name;
-                    //item.Description = entity.Description;
-
-                    _repositoryManager.<#= properClassName #>Repository.Update(item);
-                    await _repositoryManager.UnitOfWork.CompleteAsync(cancellationToken);
-                    return "<#= properClassName #> record updated";
+                    throw new Exception("Update Error");
                 }
             }
-            throw new Exception("Update Error");
+            return "<#= properClassName #> record updated";
         }
     }
 }
@@ -637,7 +695,7 @@ namespace Application.Services
 //////////////////////////////////
 // generated IServiceManager.cs //
 //////////////////////////////////
-namespace Application.Interfaces
+namespace Application.ServiceInterfaces
 {
     public interface IServiceManager
     {
@@ -651,12 +709,12 @@ namespace Application.Interfaces
 #>
     }
 }
-<# OverwriteFile("Application", "Interfaces","IServiceManager.cs"); #>
+<# OverwriteFile("Application", "ServiceInterfaces","IServiceManager.cs"); #>
 /////////////////////////////////
 // generated ServiceManager.cs //
 /////////////////////////////////
-using Application.Interfaces;
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
+using Application.ServiceInterfaces;
 
 namespace Application.Services
 {
@@ -695,7 +753,7 @@ namespace Application.Services
 /////////////////////////////////////
 // generated IRepositoryManager.cs //
 /////////////////////////////////////
-namespace Domain.Interfaces
+namespace Application.RepositoryInterfaces
 {
     public interface IRepositoryManager
     {
@@ -710,11 +768,11 @@ namespace Domain.Interfaces
         IUnitOfWork UnitOfWork { get; }
     }
 }
-<# OverwriteFile("Domain", "Interfaces","IRepositoryManager.cs"); #>
+<# OverwriteFile("Application", "RepositoryInterfaces","IRepositoryManager.cs"); #>
 ////////////////////////////////////
 // generated RepositoryManager.cs //
 ////////////////////////////////////
-using Domain.Interfaces;
+using Application.RepositoryInterfaces;
 using Persistence.Context;
 
 namespace Persistence.Repositories
